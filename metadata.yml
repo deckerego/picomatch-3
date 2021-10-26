@@ -1,0 +1,10 @@
+title: PicoMatch3
+description: A match 3 game for the Pimoroni PicoSystem
+author: DeckerEgo <john@deckerego.net>
+splash:
+  file: assets/image.png
+icon:
+  file: assets/icon.png
+version: 0.0.1
+category: game
+url: https://github.com/deckerego/picomatch-3
