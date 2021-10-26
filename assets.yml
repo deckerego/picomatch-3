@@ -1,3 +1,6 @@
 assets.cpp:
   assets/image.png:
     name: asset_image
+
+  assets/spritesheet.png:
+    name: asset_sprites
