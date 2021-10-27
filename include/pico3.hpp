@@ -18,6 +18,7 @@
 
 #include <cstdint>
 #include "32blit.hpp"
+#include "gem.hpp"
 
 struct SaveData {
 };
