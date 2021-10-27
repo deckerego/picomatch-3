@@ -38,6 +38,13 @@ void render(uint32_t time) {
   screen.clear();
 
   environment->draw(&screen, Rect(0, 0, 240, 240), nullptr);
+  for(uint8_t x = 0; x < 10; ++x) {
+    for(uint8_t y = 0; y < 9; ++y) {
+      Rect sprite = Rect(((x * y) % 5) * 3, 0, 3, 3);
+      Point position = Point(x * 24, y * 24);
+      screen.sprite(sprite, position);
+    }
+  }
 }
 
 void update(uint32_t time) {

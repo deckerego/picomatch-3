@@ -11,7 +11,7 @@ From a power-off state, hold down X (the top face button) and press Power (the b
 Your PicoSystem should mount as "RPI-RP2". On macOS this might be `/Volumes/RPI-RP2`:
 
 ```
-cp match3.app.uf2 /Volumes/RPI-RP2
+cp pico3.app.uf2 /Volumes/RPI-RP2
 ```
 
 The file should copy over, and your PicoSystem should automatically reboot into your game.
