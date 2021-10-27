@@ -25,10 +25,10 @@ void init() {
 }
 
 void render(uint32_t time) {
-    screen.alpha = 255;
-    screen.mask = nullptr;
-    screen.pen = Pen(0, 0, 0);
-    screen.clear();
+    blit::screen.alpha = 255;
+    blit::screen.mask = nullptr;
+    blit::screen.pen = blit::Pen(0, 0, 0);
+    blit::screen.clear();
 }
 
 void update(uint32_t time) {
@@ -37,12 +37,12 @@ void update(uint32_t time) {
 
 void save_game() {
   SaveData data = SaveData();
-  write_save(data);
+  blit::write_save(data);
 }
 
 void restore_game() {
   SaveData data;
-  if(read_save(data)) {
+  if(blit::read_save(data)) {
   } else {
   }
 }

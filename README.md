@@ -49,6 +49,12 @@ cmake ..
 make
 ```
 
+In MacOS you can then open the app with:
+
+```
+open PicoMatch3.app
+```
+
 ### Building for the PicoSystem
 
 If you've got local copies of the Pico SDK, Pico Extras and 32blit SDK alongside your project,
