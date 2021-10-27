@@ -20,15 +20,24 @@
 #include "pico3.hpp"
 #include "assets.hpp"
 
+using namespace blit;
+
+TileMap* environment;
+
 void init() {
-    restore_game();
+  set_screen_mode(ScreenMode::hires);
+  screen.sprites = Surface::load(spritesheet);
+  environment = new TileMap((uint8_t*)background1, nullptr, Size(32, 32), screen.sprites);
+  restore_game();
 }
 
 void render(uint32_t time) {
-    blit::screen.alpha = 255;
-    blit::screen.mask = nullptr;
-    blit::screen.pen = blit::Pen(0, 0, 0);
-    blit::screen.clear();
+  screen.alpha = 255;
+  screen.mask = nullptr;
+  screen.pen = Pen(0, 0, 0);
+  screen.clear();
+
+  environment->draw(&screen, Rect(0, 0, 240, 240), nullptr);
 }
 
 void update(uint32_t time) {
@@ -37,12 +46,12 @@ void update(uint32_t time) {
 
 void save_game() {
   SaveData data = SaveData();
-  blit::write_save(data);
+  write_save(data);
 }
 
 void restore_game() {
   SaveData data;
-  if(blit::read_save(data)) {
+  if(read_save(data)) {
   } else {
   }
 }
