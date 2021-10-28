@@ -18,9 +18,10 @@
 
 #include <cstdint>
 #include "32blit.hpp"
-#include "gem.hpp"
+#include "board.hpp"
 
 struct SaveData {
+  std::pair<blit::Point, uint8_t> board[Board::COLS][Board::ROWS];
 };
 
 void init();

@@ -17,19 +17,17 @@
 **/
 
 #include <cstdint>
-#include "32blit.hpp"
+#include "gem.hpp"
 
-struct Gem {
-    static const uint8_t SPRITE_SIZE  = 24;
-    static const uint8_t SPRITE_COUNT = 5;
-    static const uint8_t NONE         = 0;
+struct Board {
+  static const uint8_t ROWS = 9;
+  static const uint8_t COLS = 10;
 
-    uint8_t state = Gem::NONE;
-    uint8_t sprite_index = 0;
-    blit::Point position;
+  Gem* board[Board::COLS][Board::ROWS];
 
-    Gem(blit::Point pos) : sprite_index(blit::random() % Gem::SPRITE_COUNT), position(pos) {};
-    Gem(blit::Point pos, uint8_t idx) : sprite_index(idx), position(pos) {};
+  void initialize();
+  Gem* get(uint8_t x, uint8_t y);
 
-    blit::Rect next_sprite();
+  void serialize(std::pair<blit::Point, uint8_t> data[Board::COLS][Board::ROWS]);
+  void deserialize(std::pair<blit::Point, uint8_t> data[Board::COLS][Board::ROWS]);
 };

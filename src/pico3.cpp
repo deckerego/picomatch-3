@@ -23,6 +23,7 @@
 using namespace blit;
 
 TileMap* environment;
+Board board = Board();
 
 void init() {
   set_screen_mode(ScreenMode::hires);
@@ -38,11 +39,10 @@ void render(uint32_t time) {
   screen.clear();
 
   environment->draw(&screen, Rect(0, 0, 240, 240), nullptr);
-  for(uint8_t x = 0; x < 10; ++x) {
-    for(uint8_t y = 0; y < 9; ++y) {
-      Point position = Point(x * 24, y * 24);
-      Gem gem = Gem(blit::random() % SPRITE_COUNT, position);
-      screen.sprite(gem.next_sprite(), gem.position);
+  for(uint8_t x = 0; x < Board::COLS; ++x) {
+    for(uint8_t y = 0; y < Board::ROWS; ++y) {
+      Gem* gem = board.get(x, y);
+      screen.sprite(gem->next_sprite(), gem->position);
     }
   }
 }
@@ -53,12 +53,15 @@ void update(uint32_t time) {
 
 void save_game() {
   SaveData data = SaveData();
+  board.serialize(data.board);
   write_save(data);
 }
 
 void restore_game() {
   SaveData data;
   if(read_save(data)) {
+    board.deserialize(data.board);
   } else {
+    board.initialize();
   }
 }
