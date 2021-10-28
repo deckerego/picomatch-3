@@ -27,6 +27,8 @@ struct SaveData {
 void init();
 
 void render(uint32_t time);
+void render_cursor();
+void render_board();
 
 void update(uint32_t time);
 

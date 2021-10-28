@@ -18,12 +18,14 @@
 
 #include <cstdint>
 #include "pico3.hpp"
+#include "cursor.hpp"
 #include "assets.hpp"
 
 using namespace blit;
 
 TileMap* environment;
 Board board = Board();
+Cursor cursor = Cursor();
 
 void init() {
   set_screen_mode(ScreenMode::hires);
@@ -32,12 +34,11 @@ void init() {
   restore_game();
 }
 
-void render(uint32_t time) {
-  screen.alpha = 255;
-  screen.mask = nullptr;
-  screen.pen = Pen(0, 0, 0);
-  screen.clear();
+void render_cursor() {
+  screen.sprite(cursor.sprite, cursor.position);
+}
 
+void render_board() {
   environment->draw(&screen, Rect(0, 0, 240, 240), nullptr);
   for(uint8_t x = 0; x < Board::COLS; ++x) {
     for(uint8_t y = 0; y < Board::ROWS; ++y) {
@@ -45,6 +46,16 @@ void render(uint32_t time) {
       screen.sprite(gem->next_sprite(), gem->position);
     }
   }
+}
+
+void render(uint32_t time) {
+  screen.alpha = 255;
+  screen.mask = nullptr;
+  screen.pen = Pen(0, 0, 0);
+  screen.clear();
+
+  render_board();
+  render_cursor();
 }
 
 void update(uint32_t time) {

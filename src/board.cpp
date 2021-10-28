@@ -31,6 +31,13 @@ Gem* Board::get(uint8_t x, uint8_t y) {
   return board[x][y];
 }
 
+void Board::swap(uint8_t origin_x, uint8_t origin_y, uint8_t dest_x, uint8_t dest_y) {
+  if(dest_x >= Board::COLS || dest_y >= Board::ROWS) return;
+  Gem* swap = board[dest_x][dest_y];
+  board[dest_x][dest_y] = board[origin_x][origin_y];
+  board[origin_x][origin_y] = swap;
+}
+
 void Board::serialize(std::pair<blit::Point, uint8_t> data[Board::COLS][Board::ROWS]) {
   for(uint8_t y = 0; y < Board::ROWS; ++y) {
     for(uint8_t x = 0; x < Board::COLS; ++x) {

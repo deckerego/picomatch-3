@@ -27,6 +27,7 @@ struct Board {
 
   void initialize();
   Gem* get(uint8_t x, uint8_t y);
+  void swap(uint8_t origin_x, uint8_t origin_y, uint8_t dest_x, uint8_t dest_y);
 
   void serialize(std::pair<blit::Point, uint8_t> data[Board::COLS][Board::ROWS]);
   void deserialize(std::pair<blit::Point, uint8_t> data[Board::COLS][Board::ROWS]);
