@@ -55,12 +55,13 @@ void Board::swap(uint8_t origin_x, uint8_t origin_y, uint8_t dest_x, uint8_t des
 }
 
 uint8_t Board::mark_matches_horiz(uint8_t x, uint8_t y) {
-  Gem* i = board[x][y];
-  std::vector<Gem*> match_horiz = {i};
+  Gem* prev = board[x][y];
+  std::vector<Gem*> match_horiz = {prev};
 
   for(uint8_t h = x + 1; h < Board::COLS; ++h) {
-    if(i->sprite_index == board[h][y]->sprite_index) {
-      match_horiz.push_back(board[h][y]);
+    if(prev->sprite_index == board[h][y]->sprite_index && prev->left_of(board[h][y])) {
+      prev = board[h][y];
+      match_horiz.push_back(prev);
     } else {
       break;
     }
@@ -76,12 +77,13 @@ uint8_t Board::mark_matches_horiz(uint8_t x, uint8_t y) {
 }
 
 uint8_t Board::mark_matches_vert(uint8_t x, uint8_t y) {
-  Gem* i = board[x][y];
-  std::vector<Gem*> match_vert = {i};
+  Gem* prev = board[x][y];
+  std::vector<Gem*> match_vert = {prev};
 
   for(uint8_t v = y + 1; v < Board::ROWS; ++v) {
-    if(i->sprite_index == board[x][v]->sprite_index) {
-      match_vert.push_back(board[x][v]);
+    if(prev->sprite_index == board[x][v]->sprite_index && prev->up_of(board[x][v])) {
+      prev = board[x][v];
+      match_vert.push_back(prev);
     } else {
       break;
     }

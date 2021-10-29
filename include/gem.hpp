@@ -27,24 +27,28 @@ template <typename T> int sgn(T v) {
 }
 
 struct Gem {
-    static const uint8_t SPRITE_SIZE  = 24;
-    static const uint8_t SPRITE_COUNT = 5;
-    static const uint8_t NONE         = 0;
-    static const uint8_t VANISH       = 1;
+  static const uint8_t SPRITE_SIZE  = 24;
+  static const uint8_t SPRITE_COUNT = 5;
+  static const uint8_t NONE         = 0;
+  static const uint8_t VANISH       = 1;
 
-    uint8_t state = Gem::NONE;
-    uint8_t sprite_index = 0;
-    blit::Point position;
+  uint8_t state = Gem::NONE;
+  uint8_t sprite_index = 0;
+  uint8_t sprite_frame = 0;
+  blit::Point position;
 
-    Gem(blit::Point pos) : sprite_index(blit::random() % Gem::SPRITE_COUNT), position(pos) {};
-    Gem(blit::Point pos, uint8_t idx) : sprite_index(idx), position(pos) {};
+  Gem(blit::Point pos) : sprite_index(blit::random() % Gem::SPRITE_COUNT), position(pos) {};
+  Gem(blit::Point pos, uint8_t idx) : sprite_index(idx), position(pos) {};
 
-    blit::Point next_position(uint8_t x, uint8_t y);
-    blit::Rect next_sprite();
+  void advance_to(uint8_t x, uint8_t y);
+  void draw(blit::Surface screen);
 
-    void vanish();
+  bool left_of(Gem* of);
+  bool up_of(Gem* of);
 
-    std::string to_string();
+  void vanish();
+
+  std::string to_string();
 };
 
 #endif
