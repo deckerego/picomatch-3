@@ -17,3 +17,19 @@
 **/
 
 #include "cursor.hpp"
+
+void Cursor::move_left() {
+  position.x -= position.x >= Gem::SPRITE_SIZE ? Gem::SPRITE_SIZE : 0;
+}
+
+void Cursor::move_right() {
+  position.x += position.x < (240 - Gem::SPRITE_SIZE) ? Gem::SPRITE_SIZE : 0;
+}
+
+void Cursor::move_up() {
+  position.y -= position.y >= Gem::SPRITE_SIZE ? Gem::SPRITE_SIZE : 0;
+}
+
+void Cursor::move_down() {
+  position.y += position.y < (216 - Gem::SPRITE_SIZE) ? Gem::SPRITE_SIZE : 0;
+}

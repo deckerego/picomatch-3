@@ -18,7 +18,6 @@
 
 #include <cstdint>
 #include "pico3.hpp"
-#include "cursor.hpp"
 #include "assets.hpp"
 
 using namespace blit;
@@ -26,6 +25,7 @@ using namespace blit;
 TileMap* environment;
 Board board = Board();
 Cursor cursor = Cursor();
+uint32_t debounce_start = 0;
 
 void init() {
   set_screen_mode(ScreenMode::hires);
@@ -59,7 +59,16 @@ void render(uint32_t time) {
 }
 
 void update(uint32_t time) {
-  save_game();
+  if(debounce_start < time) {
+    bool pressed = true;
+    if(buttons.state & Button::DPAD_LEFT)       cursor.move_left();
+    else if(buttons.state & Button::DPAD_RIGHT) cursor.move_right();
+    else if(buttons.state & Button::DPAD_DOWN)  cursor.move_down();
+    else if(buttons.state & Button::DPAD_UP)    cursor.move_up();
+    else pressed = false;
+
+    if(pressed) debounce_start = time + DEBOUNCE_INTERVAL;
+  }
 }
 
 void save_game() {

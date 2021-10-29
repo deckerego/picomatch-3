@@ -16,6 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#ifndef LIB_GEM
+#define LIB_GEM
+
 #include <cstdint>
 #include "32blit.hpp"
 
@@ -33,3 +36,5 @@ struct Gem {
 
     blit::Rect next_sprite();
 };
+
+#endif

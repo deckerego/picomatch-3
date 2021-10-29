@@ -19,6 +19,10 @@
 #include <cstdint>
 #include "32blit.hpp"
 #include "board.hpp"
+#include "gem.hpp"
+#include "cursor.hpp"
+
+const uint8_t DEBOUNCE_INTERVAL = 200;
 
 struct SaveData {
   std::pair<blit::Point, uint8_t> board[Board::COLS][Board::ROWS];

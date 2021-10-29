@@ -17,8 +17,14 @@
 **/
 
 #include "32blit.hpp"
+#include "gem.hpp"
 
 struct Cursor {
     blit::Point position = blit::Point(0, 0);
     blit::Rect sprite = blit::Rect(0, 6, 3, 3);
+
+    void move_left();
+    void move_right();
+    void move_up();
+    void move_down();
 };
