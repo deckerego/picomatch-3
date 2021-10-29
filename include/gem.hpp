@@ -43,6 +43,8 @@ struct Gem {
     blit::Rect next_sprite();
 
     void vanish();
+
+    std::string to_string();
 };
 
 #endif

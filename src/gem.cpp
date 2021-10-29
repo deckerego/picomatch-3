@@ -38,4 +38,9 @@ blit::Rect Gem::next_sprite() {
 
 void Gem::vanish() {
   state = Gem::VANISH;
+  sprite_index = 255;
+}
+
+std::string Gem::to_string() {
+  return "State: "+std::to_string(state)+" Sprite: "+std::to_string(sprite_index)+" Position: "+std::to_string(position.x)+", "+std::to_string(position.y);
 }

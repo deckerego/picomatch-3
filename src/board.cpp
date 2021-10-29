@@ -59,9 +59,11 @@ uint8_t Board::mark_matches_horiz(uint8_t x, uint8_t y) {
   std::vector<Gem*> match_horiz = {i};
 
   for(uint8_t h = x + 1; h < Board::COLS; ++h) {
-    Gem* comp = board[h][y];
-    if(i->sprite_index == comp->sprite_index) match_horiz.push_back(comp);
-    else break;
+    if(i->sprite_index == board[h][y]->sprite_index) {
+      match_horiz.push_back(board[h][y]);
+    } else {
+      break;
+    }
   }
 
   uint8_t matched = match_horiz.size();
@@ -78,9 +80,11 @@ uint8_t Board::mark_matches_vert(uint8_t x, uint8_t y) {
   std::vector<Gem*> match_vert = {i};
 
   for(uint8_t v = y + 1; v < Board::ROWS; ++v) {
-    Gem* comp = board[x][v];
-    if(i->sprite_index == comp->sprite_index) match_vert.push_back(comp);
-    else break;
+    if(i->sprite_index == board[x][v]->sprite_index) {
+      match_vert.push_back(board[x][v]);
+    } else {
+      break;
+    }
   }
 
   uint8_t matched = match_vert.size();
@@ -97,11 +101,10 @@ uint8_t Board::mark_matches() {
 
   for(uint8_t y = 0; y < Board::ROWS; ++y) {
     for(uint8_t x = 0; x < Board::COLS; ++x) {
-      Gem* root = board[x][y];
-      if(root == nullptr) break;
-      if(root->state != Gem::NONE) break;
-      matched += mark_matches_horiz(x, y);
-      matched += mark_matches_vert(x, y);
+      if(board[x][y]->state == Gem::NONE) {
+        matched += mark_matches_horiz(x, y);
+        matched += mark_matches_vert(x, y);
+      }
     }
   }
 

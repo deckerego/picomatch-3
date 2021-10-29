@@ -42,7 +42,11 @@ void render_cursor() {
 void render_score() {
   Pen oldPen = screen.pen;
   screen.pen = Pen(0xFF, 0xFF, 0xFF);
-  screen.text("Score: " + std::to_string(current_score), minimal_font, Point(9, 224));
+  screen.text("Score: " + std::to_string(current_score), minimal_font, Point(9, 220));
+
+  Gem* selected = board.get(cursor.location().first, cursor.location().second);
+  screen.text(selected->to_string()+" Location: "+std::to_string(cursor.location().first)+", "+std::to_string(cursor.location().second), minimal_font, Point(9, 228));
+
   screen.pen = oldPen;
 }
 
