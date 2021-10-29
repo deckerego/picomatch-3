@@ -30,6 +30,7 @@ struct Gem {
     static const uint8_t SPRITE_SIZE  = 24;
     static const uint8_t SPRITE_COUNT = 5;
     static const uint8_t NONE         = 0;
+    static const uint8_t VANISH       = 1;
 
     uint8_t state = Gem::NONE;
     uint8_t sprite_index = 0;
@@ -40,6 +41,8 @@ struct Gem {
 
     blit::Point next_position(uint8_t x, uint8_t y);
     blit::Rect next_sprite();
+
+    void vanish();
 };
 
 #endif

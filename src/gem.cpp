@@ -29,5 +29,13 @@ blit::Point Gem::next_position(uint8_t x, uint8_t y) {
 }
 
 blit::Rect Gem::next_sprite() {
-  return blit::Rect((sprite_index << 1) + sprite_index, 0, Gem::SPRITE_SIZE >> 3, Gem::SPRITE_SIZE >> 3);
+  if(state == Gem::VANISH) {
+    return blit::Rect(0, 0, 0, 0);
+  } else {
+    return blit::Rect((sprite_index << 1) + sprite_index, 0, Gem::SPRITE_SIZE >> 3, Gem::SPRITE_SIZE >> 3);
+  }
+}
+
+void Gem::vanish() {
+  state = Gem::VANISH;
 }
