@@ -43,7 +43,7 @@ void render_board() {
   for(uint8_t x = 0; x < Board::COLS; ++x) {
     for(uint8_t y = 0; y < Board::ROWS; ++y) {
       Gem* gem = board.get(x, y);
-      screen.sprite(gem->next_sprite(), gem->position);
+      screen.sprite(gem->next_sprite(), gem->next_position(x, y));
     }
   }
 }
@@ -69,6 +69,11 @@ void update(uint32_t time) {
 
     if(pressed) debounce_start = time + DEBOUNCE_INTERVAL;
   }
+
+  if(buttons.pressed & Button::Y) board.swap_left(cursor.location());
+  if(buttons.pressed & Button::A) board.swap_right(cursor.location());
+  if(buttons.pressed & Button::B) board.swap_down(cursor.location());
+  if(buttons.pressed & Button::X) board.swap_up(cursor.location());
 }
 
 void save_game() {

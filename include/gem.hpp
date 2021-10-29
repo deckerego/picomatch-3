@@ -22,6 +22,10 @@
 #include <cstdint>
 #include "32blit.hpp"
 
+template <typename T> int sgn(T v) {
+    return (T(0) < v) - (v < T(0));
+}
+
 struct Gem {
     static const uint8_t SPRITE_SIZE  = 24;
     static const uint8_t SPRITE_COUNT = 5;
@@ -34,6 +38,7 @@ struct Gem {
     Gem(blit::Point pos) : sprite_index(blit::random() % Gem::SPRITE_COUNT), position(pos) {};
     Gem(blit::Point pos, uint8_t idx) : sprite_index(idx), position(pos) {};
 
+    blit::Point next_position(uint8_t x, uint8_t y);
     blit::Rect next_sprite();
 };
 

@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include <cstdint>
 #include "32blit.hpp"
 #include "gem.hpp"
 
@@ -27,4 +28,6 @@ struct Cursor {
     void move_right();
     void move_up();
     void move_down();
+
+    std::pair<uint8_t, uint8_t> location();
 };

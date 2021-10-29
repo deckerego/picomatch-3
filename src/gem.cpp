@@ -18,6 +18,16 @@
 
 #include "gem.hpp"
 
+blit::Point Gem::next_position(uint8_t x, uint8_t y) {
+  uint8_t dest_x = Gem::SPRITE_SIZE * x;
+  uint8_t dest_y = Gem::SPRITE_SIZE * y;
+
+  position.x += sgn(dest_x - position.x);
+  position.y += sgn(dest_y - position.y);
+
+  return position;
+}
+
 blit::Rect Gem::next_sprite() {
   return blit::Rect((sprite_index << 1) + sprite_index, 0, Gem::SPRITE_SIZE >> 3, Gem::SPRITE_SIZE >> 3);
 }

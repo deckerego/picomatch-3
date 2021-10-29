@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include <cstdlib>
 #include "cursor.hpp"
 
 void Cursor::move_left() {
@@ -32,4 +33,8 @@ void Cursor::move_up() {
 
 void Cursor::move_down() {
   position.y += position.y < (216 - Gem::SPRITE_SIZE) ? Gem::SPRITE_SIZE : 0;
+}
+
+std::pair<uint8_t, uint8_t> Cursor::location() {
+  return {position.x / Gem::SPRITE_SIZE, position.y / Gem::SPRITE_SIZE};
 }

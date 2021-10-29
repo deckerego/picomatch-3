@@ -17,6 +17,7 @@
 **/
 
 #include <cstdint>
+#include <cstdlib>
 #include "gem.hpp"
 
 struct Board {
@@ -27,8 +28,15 @@ struct Board {
 
   void initialize();
   Gem* get(uint8_t x, uint8_t y);
-  void swap(uint8_t origin_x, uint8_t origin_y, uint8_t dest_x, uint8_t dest_y);
+
+  void swap_left(std::pair<uint8_t, uint8_t> location);
+  void swap_right(std::pair<uint8_t, uint8_t> location);
+  void swap_up(std::pair<uint8_t, uint8_t> location);
+  void swap_down(std::pair<uint8_t, uint8_t> location);
 
   void serialize(std::pair<blit::Point, uint8_t> data[Board::COLS][Board::ROWS]);
   void deserialize(std::pair<blit::Point, uint8_t> data[Board::COLS][Board::ROWS]);
+
+private:
+  void swap(uint8_t origin_x, uint8_t origin_y, uint8_t dest_x, uint8_t dest_y);
 };

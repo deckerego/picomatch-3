@@ -31,6 +31,22 @@ Gem* Board::get(uint8_t x, uint8_t y) {
   return board[x][y];
 }
 
+void Board::swap_left(std::pair<uint8_t, uint8_t> location) {
+ swap(location.first, location.second, location.first - 1, location.second);
+}
+
+void Board::swap_right(std::pair<uint8_t, uint8_t> location) {
+ swap(location.first, location.second, location.first + 1, location.second);
+}
+
+void Board::swap_up(std::pair<uint8_t, uint8_t> location) {
+ swap(location.first, location.second, location.first, location.second - 1);
+}
+
+void Board::swap_down(std::pair<uint8_t, uint8_t> location) {
+ swap(location.first, location.second, location.first, location.second + 1);
+}
+
 void Board::swap(uint8_t origin_x, uint8_t origin_y, uint8_t dest_x, uint8_t dest_y) {
   if(dest_x >= Board::COLS || dest_y >= Board::ROWS) return;
   Gem* swap = board[dest_x][dest_y];
