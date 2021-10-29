@@ -54,6 +54,47 @@ void Board::swap(uint8_t origin_x, uint8_t origin_y, uint8_t dest_x, uint8_t des
   board[origin_x][origin_y] = swap;
 }
 
+uint8_t Board::mark_matches_horiz(uint8_t x, uint8_t y) {
+  Gem* i = board[x][y];
+  std::vector<uint8_t> match_horiz = {x};
+
+  for(uint8_t h = x + 1; h < Board::COLS; ++h) {
+    if(i->sprite_index == board[h][y]->sprite_index) match_horiz.push_back(h);
+    else break;
+  }
+
+  uint8_t matched = match_horiz.size();
+  return matched > 2 ? matched : 0;
+}
+
+uint8_t Board::mark_matches_vert(uint8_t x, uint8_t y) {
+  Gem* i = board[x][y];
+  std::vector<uint8_t> match_vert = {y};
+
+  for(uint8_t v = y + 1; v < Board::ROWS; ++v) {
+    if(i->sprite_index == board[x][v]->sprite_index) match_vert.push_back(v);
+    else break;
+  }
+
+  uint8_t matched = match_vert.size();
+  return matched > 2 ? matched : 0;
+}
+
+uint8_t Board::mark_matches() {
+  uint8_t matched = 0;
+
+  for(uint8_t y = 0; y < Board::ROWS; ++y) {
+    for(uint8_t x = 0; x < Board::COLS; ++x) {
+      Gem* root = board[x][y];
+      if(root == nullptr) break;
+      matched += mark_matches_horiz(x, y);
+      matched += mark_matches_vert(x, y);
+    }
+  }
+
+  return matched;
+}
+
 void Board::serialize(std::pair<blit::Point, uint8_t> data[Board::COLS][Board::ROWS]) {
   for(uint8_t y = 0; y < Board::ROWS; ++y) {
     for(uint8_t x = 0; x < Board::COLS; ++x) {

@@ -25,6 +25,7 @@
 const uint8_t DEBOUNCE_INTERVAL = 200;
 
 struct SaveData {
+  uint32_t current_score = 0;
   std::pair<blit::Point, uint8_t> board[Board::COLS][Board::ROWS];
 };
 

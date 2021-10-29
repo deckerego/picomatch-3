@@ -26,6 +26,7 @@ TileMap* environment;
 Board board = Board();
 Cursor cursor = Cursor();
 uint32_t debounce_start = 0;
+uint32_t current_score = 0;
 
 void init() {
   set_screen_mode(ScreenMode::hires);
@@ -36,6 +37,13 @@ void init() {
 
 void render_cursor() {
   screen.sprite(cursor.sprite, cursor.position);
+}
+
+void render_score() {
+  Pen oldPen = screen.pen;
+  screen.pen = Pen(0xFF, 0xFF, 0xFF);
+  screen.text("Score: " + std::to_string(current_score), minimal_font, Point(9, 224));
+  screen.pen = oldPen;
 }
 
 void render_board() {
@@ -55,6 +63,7 @@ void render(uint32_t time) {
   screen.clear();
 
   render_board();
+  render_score();
   render_cursor();
 }
 
@@ -74,19 +83,24 @@ void update(uint32_t time) {
   if(buttons.pressed & Button::A) board.swap_right(cursor.location());
   if(buttons.pressed & Button::B) board.swap_down(cursor.location());
   if(buttons.pressed & Button::X) board.swap_up(cursor.location());
+
+  current_score += board.mark_matches();
 }
 
 void save_game() {
   SaveData data = SaveData();
   board.serialize(data.board);
+  data.current_score = current_score;
   write_save(data);
 }
 
 void restore_game() {
   SaveData data;
   if(read_save(data)) {
+    current_score = data.current_score;
     board.deserialize(data.board);
   } else {
+    current_score = 0;
     board.initialize();
   }
 }
