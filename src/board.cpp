@@ -27,8 +27,31 @@ void Board::initialize() {
   }
 }
 
-Gem* Board::get(uint8_t x, uint8_t y) {
-  return board[x][y];
+void Board::draw(blit::Surface screen) {
+  for(uint8_t x = 0; x < Board::COLS; ++x) {
+    for(uint8_t y = 0; y < Board::ROWS; ++y) {
+      board[x][y]->draw(screen);
+    }
+  }
+}
+
+void Board::remove(uint8_t x, uint8_t y) {
+  Gem* old = board[x][y];
+  for(int fall_y = y; fall_y > 0; --fall_y) {
+    board[x][fall_y] = board[x][fall_y - 1];
+  }
+  board[x][0] = new Gem(blit::Point(x * Gem::SPRITE_SIZE, 0));
+  delete old;
+}
+
+void Board::update() {
+  for(uint8_t x = 0; x < Board::COLS; ++x) {
+    for(uint8_t y = 0; y < Board::ROWS; ++y) {
+      Gem* gem = board[x][y];
+      if(gem->state == Gem::DELETE) remove(x, y);
+      else gem->advance_to(x, y);
+    }
+  }
 }
 
 void Board::swap_left(std::pair<uint8_t, uint8_t> location) {

@@ -31,6 +31,7 @@ struct Gem {
   static const uint8_t SPRITE_COUNT = 5;
   static const uint8_t NONE         = 0;
   static const uint8_t VANISH       = 1;
+  static const uint8_t DELETE       = 2;
 
   uint8_t state = Gem::NONE;
   uint8_t sprite_index = 0;

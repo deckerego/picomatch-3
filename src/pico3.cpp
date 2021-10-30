@@ -44,29 +44,7 @@ void render_score() {
   screen.pen = Pen(0xFF, 0xFF, 0xFF);
   screen.text("Score: " + std::to_string(current_score), minimal_font, Point(9, 220));
 
-  Gem* selected = board.get(cursor.location().first, cursor.location().second);
-  screen.text(selected->to_string()+" Location: "+std::to_string(cursor.location().first)+", "+std::to_string(cursor.location().second), minimal_font, Point(9, 228));
-
   screen.pen = oldPen;
-}
-
-void render_board() {
-  environment->draw(&screen, Rect(0, 0, 240, 240), nullptr);
-  for(uint8_t x = 0; x < Board::COLS; ++x) {
-    for(uint8_t y = 0; y < Board::ROWS; ++y) {
-      Gem* gem = board.get(x, y);
-      gem->draw(screen);
-    }
-  }
-}
-
-void update_board() {
-  for(uint8_t x = 0; x < Board::COLS; ++x) {
-    for(uint8_t y = 0; y < Board::ROWS; ++y) {
-      Gem* gem = board.get(x, y);
-      gem->advance_to(x, y);
-    }
-  }
 }
 
 void render(uint32_t time) {
@@ -75,7 +53,8 @@ void render(uint32_t time) {
   screen.pen = Pen(0, 0, 0);
   screen.clear();
 
-  render_board();
+  environment->draw(&screen, Rect(0, 0, 240, 240), nullptr);
+  board.draw(screen);
   render_score();
   render_cursor();
 }
@@ -98,7 +77,7 @@ void update(uint32_t time) {
   if(buttons.pressed & Button::X) board.swap_up(cursor.location());
 
   current_score += board.mark_matches();
-  update_board();
+  board.update();
 }
 
 void save_game() {

@@ -26,6 +26,7 @@ void Gem::advance_to(uint8_t x, uint8_t y) {
   position.y += sgn(dest_y - position.y);
 
   if(sprite_frame > 0) --sprite_frame;
+  if(state == Gem::VANISH && sprite_frame == 0) state = Gem::DELETE;
 }
 
 void Gem::draw(blit::Surface screen) {
