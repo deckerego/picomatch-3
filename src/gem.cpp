@@ -52,7 +52,7 @@ bool Gem::up_of(Gem* of) {
 
 void Gem::vanish() {
   state = Gem::VANISH;
-  sprite_frame = 10;
+  sprite_frame = 20;
 }
 
 std::string Gem::to_string() {

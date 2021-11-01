@@ -36,17 +36,20 @@ void Board::draw(blit::Surface screen) {
 }
 
 void Board::remove(uint8_t x, uint8_t y) {
-  Gem* old = board[x][y];
-  for(int fall_y = y; fall_y > 0; --fall_y) {
-    board[x][fall_y] = board[x][fall_y - 1];
+  Gem* gem = board[x][y];
+  if(y > 0) {
+    board[x][y] = board[x][y - 1];
+    board[x][y - 1] = gem;
+  } else {
+    int8_t prev_y = board[x][1]->position.y;
+    board[x][0] = new Gem(blit::Point(x * Gem::SPRITE_SIZE, prev_y - Gem::SPRITE_SIZE));
+    delete gem;
   }
-  board[x][0] = new Gem(blit::Point(x * Gem::SPRITE_SIZE, 0));
-  delete old;
 }
 
 void Board::update() {
-  for(uint8_t x = 0; x < Board::COLS; ++x) {
-    for(uint8_t y = 0; y < Board::ROWS; ++y) {
+  for(int8_t y = Board::ROWS - 1; y >= 0; --y) {
+    for(uint8_t x = 0; x < Board::COLS; ++x) {
       Gem* gem = board[x][y];
       if(gem->state == Gem::DELETE) remove(x, y);
       else gem->advance_to(x, y);
