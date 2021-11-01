@@ -22,11 +22,12 @@
 #include "gem.hpp"
 #include "cursor.hpp"
 
-const uint8_t DEBOUNCE_INTERVAL = 200;
+const uint16_t BUTTON_DEBOUNCE_INTERVAL = 200;
+const uint16_t SAVE_DEBOUNCE_INTERVAL = 2000;
 
 struct SaveData {
-  uint32_t current_score = 0;
-  uint32_t high_score = 0;
+  uint32_t current_score;
+  uint32_t high_score;
   std::pair<blit::Point, uint8_t> board[Board::COLS][Board::ROWS];
 };
 
@@ -39,4 +40,4 @@ void render_board();
 void update(uint32_t time);
 
 void save_game();
-void restore_game();
+void restore_game(bool reinitialize=false);

@@ -4,3 +4,8 @@ assets.cpp:
 
   assets/background1.tmx:
     name: background1
+
+font_asset.cpp:
+  assets/fonts/Thicket.ttf:
+    name: chevyray
+    height: 12

@@ -19,14 +19,17 @@
 #include <cstdint>
 #include "pico3.hpp"
 #include "assets.hpp"
+#include "font_asset.hpp"
 
 using namespace blit;
 
-TileMap* environment;
+const Font custom_font(chevyray);
+
 Board board = Board();
 Cursor cursor = Cursor();
-uint32_t debounce_start = 0;
-uint32_t current_score, last_score, high_score = 0;
+TileMap* environment;
+uint32_t button_debounce, save_debounce = 0;
+uint32_t current_score, high_score = 0;
 
 void init() {
   set_screen_mode(ScreenMode::hires);
@@ -42,8 +45,8 @@ void render_cursor() {
 void render_score() {
   Pen oldPen = screen.pen;
   screen.pen = Pen(0xFF, 0xFF, 0xFF);
-  screen.text("Score: " + std::to_string(current_score), minimal_font, Point(9, 220));
-  screen.text("High Score: " + std::to_string(high_score), minimal_font, Point(9, 226));
+  screen.text("Score: " + std::to_string(current_score), custom_font, Point(9, 214));
+  screen.text("Best: " + std::to_string(high_score), custom_font, Point(9, 226));
 
   screen.pen = oldPen;
 }
@@ -61,7 +64,7 @@ void render(uint32_t time) {
 }
 
 void update(uint32_t time) {
-  if(debounce_start < time) {
+  if(button_debounce < time) {
     bool pressed = true;
     if(buttons.state & Button::DPAD_LEFT)       cursor.move_left();
     else if(buttons.state & Button::DPAD_RIGHT) cursor.move_right();
@@ -69,7 +72,7 @@ void update(uint32_t time) {
     else if(buttons.state & Button::DPAD_UP)    cursor.move_up();
     else pressed = false;
 
-    if(pressed) debounce_start = time + DEBOUNCE_INTERVAL;
+    if(pressed) button_debounce = time + BUTTON_DEBOUNCE_INTERVAL;
   }
 
   if(buttons.pressed & Button::Y) board.swap_left(cursor.location());
@@ -77,29 +80,30 @@ void update(uint32_t time) {
   if(buttons.pressed & Button::B) board.swap_down(cursor.location());
   if(buttons.pressed & Button::X) board.swap_up(cursor.location());
 
-  uint32_t score = board.mark_matches();
+  uint8_t score = board.mark_matches();
   if(score > 0) {
     current_score += score;
     if(current_score > high_score) high_score = current_score;
-  } else if(last_score > 0) {
+    save_debounce = time + SAVE_DEBOUNCE_INTERVAL;
+  } else if(save_debounce != 0 && save_debounce < time) {
     save_game();
+    save_debounce = 0;
   }
-  last_score = score;
 
   board.update();
 }
 
 void save_game() {
   SaveData data = SaveData();
-  board.serialize(data.board);
   data.current_score = current_score;
   data.high_score = high_score;
+  board.serialize(data.board);
   write_save(data);
 }
 
-void restore_game() {
+void restore_game(bool reinitialize) {
   SaveData data;
-  if(read_save(data)) {
+  if(!reinitialize && read_save(data)) {
     current_score = data.current_score;
     high_score = data.high_score;
     board.deserialize(data.board);

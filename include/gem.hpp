@@ -29,6 +29,7 @@ template <typename T> int sgn(T v) {
 struct Gem {
   static const uint8_t SPRITE_SIZE  = 24;
   static const uint8_t SPRITE_COUNT = 5;
+
   static const uint8_t NONE         = 0;
   static const uint8_t VANISH       = 1;
   static const uint8_t DELETE       = 2;
@@ -48,8 +49,6 @@ struct Gem {
   bool up_of(Gem* of);
 
   void vanish();
-
-  std::string to_string();
 };
 
 #endif
