@@ -129,7 +129,9 @@ uint8_t Board::mark_matches() {
 
   for(uint8_t y = 0; y < Board::ROWS; ++y) {
     for(uint8_t x = 0; x < Board::COLS; ++x) {
-      if(board[x][y]->state == Gem::NONE) {
+      if(board[x][y]->state == Gem::NONE &&
+         board[x][y]->position.y >= 0
+       ) {
         matched += mark_matches_horiz(x, y);
         matched += mark_matches_vert(x, y);
       }
