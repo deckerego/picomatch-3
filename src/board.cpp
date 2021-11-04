@@ -115,13 +115,15 @@ uint8_t Board::mark_matches() {
     prev_y = { board[y][0] };
 
     for(uint8_t x = 1; x < Board::COLS; ++x) {
-      if(!board[x][y]->eligible() || !board[y][x]->eligible())
-        return matched; //Quit early if we aren't ready
-
-      if(y < Board::ROWS)
+      if(y < Board::ROWS) {
+        if(!board[x][y]->eligible()) return matched;
         matched += matches(&prev_x, board[x][y]);
-      if(x < Board::ROWS)
+      }
+
+      if(x < Board::ROWS) {
+        if(!board[y][x]->eligible()) return matched;
         matched += matches(&prev_y, board[y][x]);
+      }
     }
 
     matched += vanish_count(prev_x);
