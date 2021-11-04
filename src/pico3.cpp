@@ -35,7 +35,7 @@ void init() {
   set_screen_mode(ScreenMode::hires);
   screen.sprites = Surface::load(spritesheet);
   environment = new TileMap((uint8_t*)background1, nullptr, Size(32, 32), screen.sprites);
-  restore_game();
+  restore_game(true);
 }
 
 void render_cursor() {

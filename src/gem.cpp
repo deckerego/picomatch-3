@@ -50,6 +50,10 @@ bool Gem::up_of(Gem* of) {
   return position.x == of->position.x && (position.y + Gem::SPRITE_SIZE) == of->position.y;
 }
 
+bool Gem::eligible() {
+  return state == Gem::NONE && position.y >= 0;
+}
+
 void Gem::vanish() {
   state = Gem::VANISH;
   sprite_frame = 20;

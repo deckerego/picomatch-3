@@ -17,6 +17,7 @@
 **/
 
 #include <cstdint>
+#include <vector>
 #include "board.hpp"
 
 void Board::initialize() {
@@ -80,62 +81,51 @@ void Board::swap(uint8_t origin_x, uint8_t origin_y, uint8_t dest_x, uint8_t des
   board[origin_x][origin_y] = swap;
 }
 
-uint8_t Board::mark_matches_horiz(uint8_t x, uint8_t y) {
-  Gem* prev = board[x][y];
-  std::vector<Gem*> match_horiz = {prev};
-
-  for(uint8_t h = x + 1; h < Board::COLS; ++h) {
-    if(prev->sprite_index == board[h][y]->sprite_index && prev->left_of(board[h][y])) {
-      prev = board[h][y];
-      match_horiz.push_back(prev);
-    } else {
-      break;
-    }
+uint8_t vanish_count(std::vector<Gem*> match_list) {
+  uint8_t matched = 0;
+  uint8_t list_size = match_list.size();
+  if(list_size > 2) {
+    for(Gem* gem : match_list) gem->vanish();
+    matched += list_size;
   }
-
-  uint8_t matched = match_horiz.size();
-  if(matched > 2) {
-    for(Gem* match : match_horiz) match->vanish();
-    return matched;
-  } else {
-    return 0;
-  }
+  return matched;
 }
 
-uint8_t Board::mark_matches_vert(uint8_t x, uint8_t y) {
-  Gem* prev = board[x][y];
-  std::vector<Gem*> match_vert = {prev};
+uint8_t matches(std::vector<Gem*>* prev, Gem* current) {
+  uint8_t matched = 0;
 
-  for(uint8_t v = y + 1; v < Board::ROWS; ++v) {
-    if(prev->sprite_index == board[x][v]->sprite_index && prev->up_of(board[x][v])) {
-      prev = board[x][v];
-      match_vert.push_back(prev);
-    } else {
-      break;
-    }
+  if(prev->back()->sprite_index != current->sprite_index) {
+    matched += vanish_count(*prev);
+    prev->clear();
   }
+  prev->push_back(current);
 
-  uint8_t matched = match_vert.size();
-  if(matched > 2) {
-    for(Gem* match : match_vert) match->vanish();
-    return matched;
-  } else {
-    return 0;
-  }
+  return matched;
 }
 
 uint8_t Board::mark_matches() {
   uint8_t matched = 0;
+  std::vector<Gem*> prev_x, prev_y;
 
-  for(uint8_t y = 0; y < Board::ROWS; ++y) {
-    for(uint8_t x = 0; x < Board::COLS; ++x) {
-      if(board[x][y]->state == Gem::NONE &&
-         board[x][y]->position.y >= 0
-       ) {
-        matched += mark_matches_horiz(x, y);
-        matched += mark_matches_vert(x, y);
-      }
+  for(uint8_t y = 0; y < Board::COLS; ++y) {
+    if(!board[0][y]->eligible() || !board[y][0]->eligible())
+      return matched; //Quit early if we aren't ready
+
+    prev_x = { board[0][y] };
+    prev_y = { board[y][0] };
+
+    for(uint8_t x = 1; x < Board::COLS; ++x) {
+      if(!board[x][y]->eligible() || !board[y][x]->eligible())
+        return matched; //Quit early if we aren't ready
+
+      if(y < Board::ROWS)
+        matched += matches(&prev_x, board[x][y]);
+      if(x < Board::ROWS)
+        matched += matches(&prev_y, board[y][x]);
     }
+
+    matched += vanish_count(prev_x);
+    matched += vanish_count(prev_y);
   }
 
   return matched;

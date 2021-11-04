@@ -47,6 +47,7 @@ struct Gem {
 
   bool left_of(Gem* of);
   bool up_of(Gem* of);
+  bool eligible();
 
   void vanish();
 };

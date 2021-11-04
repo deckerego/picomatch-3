@@ -43,7 +43,4 @@ struct Board {
 private:
   void swap(uint8_t origin_x, uint8_t origin_y, uint8_t dest_x, uint8_t dest_y);
   void remove(uint8_t x, uint8_t y);
-
-  uint8_t mark_matches_horiz(uint8_t x, uint8_t y);
-  uint8_t mark_matches_vert(uint8_t x, uint8_t y);
 };
