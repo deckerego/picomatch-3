@@ -17,7 +17,6 @@
 **/
 
 #include <cstdint>
-#include <vector>
 #include "board.hpp"
 
 void Board::initialize() {
@@ -107,7 +106,8 @@ uint8_t Board::mark_matches() {
   uint8_t matched = 0;
   std::vector<Gem*> prev_x, prev_y;
 
-  for(uint8_t y = 0; y < Board::COLS; ++y) {
+  //Address things as a 9x9 square
+  for(uint8_t y = 0; y < Board::ROWS; ++y) {
     if(!board[0][y]->eligible() || !board[y][0]->eligible())
       return matched; //Quit early if we aren't ready
 
@@ -115,10 +115,8 @@ uint8_t Board::mark_matches() {
     prev_y = { board[y][0] };
 
     for(uint8_t x = 1; x < Board::COLS; ++x) {
-      if(y < Board::ROWS) {
-        if(!board[x][y]->eligible()) return matched;
-        matched += matches(&prev_x, board[x][y]);
-      }
+      if(!board[x][y]->eligible()) return matched;
+      matched += matches(&prev_x, board[x][y]);
 
       if(x < Board::ROWS) {
         if(!board[y][x]->eligible()) return matched;
@@ -127,6 +125,19 @@ uint8_t Board::mark_matches() {
     }
 
     matched += vanish_count(prev_x);
+    matched += vanish_count(prev_y);
+  }
+
+  //Take care of the last columns in a rectangular board
+  for(uint8_t x = Board::ROWS; x < Board::COLS; ++x) {
+    if(!board[x][0]->eligible()) return matched;
+    prev_y = { board[x][0] };
+
+    for(uint8_t y = 1; y < Board::ROWS; ++y) {
+      if(!board[x][y]->eligible()) return matched;
+      matched += matches(&prev_y, board[x][y]);
+    }
+
     matched += vanish_count(prev_y);
   }
 
