@@ -23,8 +23,10 @@
 struct Board {
   static const uint8_t ROWS = 9;
   static const uint8_t COLS = 10;
+  static const uint32_t GAME_TIME = 30 * 1000;
 
   Gem* board[Board::COLS][Board::ROWS];
+  uint32_t time_elapsed = 0;
 
   void initialize();
   void draw(blit::Surface screen);

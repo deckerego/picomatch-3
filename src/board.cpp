@@ -20,6 +20,7 @@
 #include "board.hpp"
 
 void Board::initialize() {
+  time_elapsed = 0;
   for(uint8_t x = 0; x < Board::COLS; ++x) {
     for(uint8_t y = 0; y < Board::ROWS; ++y) {
       board[x][y] = new Gem(blit::Point(x * Gem::SPRITE_SIZE, y * Gem::SPRITE_SIZE));

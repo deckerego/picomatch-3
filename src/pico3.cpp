@@ -28,14 +28,14 @@ const Font custom_font(chevyray);
 Board board = Board();
 Cursor cursor = Cursor();
 TileMap* environment;
-uint32_t button_debounce, save_debounce = 0;
+uint32_t button_debounce, last_update = 0;
 uint32_t current_score, high_score = 0;
 
 void init() {
   set_screen_mode(ScreenMode::hires);
   screen.sprites = Surface::load(spritesheet);
   environment = new TileMap((uint8_t*)background1, nullptr, Size(32, 32), screen.sprites);
-  restore_game(true);
+  restore_game();
 }
 
 void render_cursor() {
@@ -51,6 +51,16 @@ void render_score() {
   screen.pen = oldPen;
 }
 
+void render_time() {
+  Pen oldPen = screen.pen;
+  screen.pen = Pen(0xFF, 0xFF, 0xFF);
+
+  uint32_t remaining_time = Board::GAME_TIME - board.time_elapsed;
+  uint32_t length = (remaining_time * 146) / Board::GAME_TIME;
+  screen.rectangle(Rect(88, 220, length, 8));
+  screen.pen = oldPen;
+}
+
 void render(uint32_t time) {
   screen.alpha = 255;
   screen.mask = nullptr;
@@ -59,11 +69,20 @@ void render(uint32_t time) {
 
   environment->draw(&screen, Rect(0, 0, 240, 240), nullptr);
   board.draw(screen);
-  render_score();
   render_cursor();
+  render_score();
+  render_time();
 }
 
 void update(uint32_t time) {
+  board.time_elapsed += time - last_update;
+  last_update = time;
+  if(board.time_elapsed > Board::GAME_TIME) {
+    current_score = 0;
+    board.initialize();
+    save_game();
+  }
+
   if(button_debounce < time) {
     bool pressed = true;
     if(buttons.state & Button::DPAD_LEFT)       cursor.move_left();
@@ -80,15 +99,8 @@ void update(uint32_t time) {
   if(buttons.pressed & Button::B) board.swap_down(cursor.location());
   if(buttons.pressed & Button::X) board.swap_up(cursor.location());
 
-  uint8_t score = board.mark_matches();
-  if(score > 0) {
-    current_score += score;
-    if(current_score > high_score) high_score = current_score;
-    save_debounce = time + SAVE_DEBOUNCE_INTERVAL;
-  } else if(save_debounce != 0 && save_debounce < time) {
-    save_game();
-    save_debounce = 0;
-  }
+  current_score += board.mark_matches();
+  if(current_score > high_score) high_score = current_score;
 
   board.update();
 }
