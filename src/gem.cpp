@@ -37,14 +37,14 @@ bool Gem::deletable() {
 void Gem::draw(blit::Surface screen) {
   blit::Rect sprite = blit::Rect(sprite_index * 3, 0, Gem::SPRITE_SIZE / 8, Gem::SPRITE_SIZE / 8);
   if(state == Gem::VANISH) {
-    float scale = sprite_frame == 0 ? 0.0f : 1.0f - (1.0f / sprite_frame);
-    uint32_t origin_xy = (Gem::SPRITE_SIZE * scale) - Gem::SPRITE_SIZE;
+    float scale = sprite_frame == 0 ? 0.0f : 1.0f + (-1.0f / sprite_frame);
+    uint32_t origin_xy = scale <= 0.0f ? 0 : (Gem::SPRITE_SIZE * (scale - 1.0f)) / (scale * 2);
     blit::Point spr_orig = blit::Point(origin_xy, origin_xy);
     blit::Point spr_pos = blit::Point(position.x, position.y);
     screen.sprite(sprite, spr_pos, spr_orig, scale, blit::SpriteTransform::NONE);
   } else if(state == Gem::ASPLODE) {
-    float scale = sprite_frame == 0 ? 8.0f : 1.0f + (7.0f / sprite_frame);
-    uint32_t origin_xy = (Gem::SPRITE_SIZE / (scale * 2)) * (scale - 1.0f);
+    float scale = sprite_frame == 0 ? 4.0f : 1.0f + (3.0f / sprite_frame);
+    uint32_t origin_xy = (Gem::SPRITE_SIZE * (scale - 1.0f)) / (scale * 2);
     blit::Point spr_orig = blit::Point(origin_xy, origin_xy);
     blit::Point spr_pos = blit::Point(position.x, position.y);
     screen.sprite(sprite, spr_pos, spr_orig, scale, blit::SpriteTransform::NONE);
@@ -67,10 +67,10 @@ bool Gem::eligible() {
 
 void Gem::vanish() {
   state = Gem::VANISH;
-  sprite_frame = 20;
+  sprite_frame = 30;
 }
 
 void Gem::asplode() {
   state = Gem::ASPLODE;
-  sprite_frame = 20;
+  sprite_frame = 30;
 }
