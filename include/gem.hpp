@@ -51,6 +51,9 @@ struct Gem {
   bool up_of(Gem* of);
   bool eligible();
   bool deletable();
+
+private:
+  void draw_scale(blit::Surface screen, float scale);
 };
 
 #endif
