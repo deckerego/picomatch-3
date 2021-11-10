@@ -21,17 +21,36 @@
 
 void Board::initialize() {
   time_elapsed = 0;
+  state = Board::NONE;
+
   for(uint8_t x = 0; x < Board::COLS; ++x) {
     for(uint8_t y = 0; y < Board::ROWS; ++y) {
-      board[x][y] = new Gem(blit::Point(x * Gem::SPRITE_SIZE, y * Gem::SPRITE_SIZE));
+      int32_t y_pos = ((y - Board::ROWS) * Gem::SPRITE_SIZE) + (8 * y);
+      int32_t x_pos = x * Gem::SPRITE_SIZE;
+      board[x][y] = new Gem(blit::Point(x_pos, y_pos));
     }
   }
+}
+
+void Board::clear() {
+  state = Board::CLEAR;
+  for(uint8_t x = 0; x < Board::COLS; ++x) {
+    for(uint8_t y = 0; y < Board::ROWS; ++y) {
+      board[x][y]->asplode();
+    }
+  }
+}
+
+bool Board::cleared() {
+  return
+    state == Board::CLEAR &&
+    board[Board::COLS - 1][Board::ROWS - 1] == nullptr;
 }
 
 void Board::draw(blit::Surface screen) {
   for(uint8_t x = 0; x < Board::COLS; ++x) {
     for(uint8_t y = 0; y < Board::ROWS; ++y) {
-      board[x][y]->draw(screen);
+      if(board[x][y] != nullptr) board[x][y]->draw(screen);
     }
   }
 }
@@ -43,7 +62,7 @@ void Board::remove(uint8_t x, uint8_t y) {
     board[x][y - 1] = gem;
   } else {
     int8_t prev_y = board[x][1]->position.y;
-    board[x][0] = new Gem(blit::Point(x * Gem::SPRITE_SIZE, prev_y - Gem::SPRITE_SIZE));
+    board[x][0] = state == Board::CLEAR ? nullptr : new Gem(blit::Point(x * Gem::SPRITE_SIZE, prev_y - Gem::SPRITE_SIZE));
     delete gem;
   }
 }
@@ -109,6 +128,8 @@ uint8_t matches(std::vector<Gem*>* prev, Gem* current) {
 }
 
 uint8_t Board::mark_matches() {
+  if(state != Board::NONE) return 0;
+
   uint8_t matched = 0;
   std::vector<Gem*> prev_x, prev_y;
 
