@@ -2,6 +2,8 @@
 
 A match 3 game for the Pimoroni PicoSystem.
 
+![Match 3 Screenshot](./docs/images/screenshot.png)
+
 ## Copying Match3 to your PicoSystem
 
 Download [the latest release from the GitHub releases page](https://github.com/deckerego/picomatch-3/releases), then connect your PicoSystem to your computer using a USB Type-C cable.
