@@ -28,17 +28,10 @@ const Font custom_font(chevyray);
 Board board = Board();
 Cursor cursor = Cursor();
 TileMap* environment;
+uint8_t level = 0;
 uint32_t button_debounce, last_update = 0;
 uint32_t current_score, high_score = 0;
 std::deque<uint8_t> bonus_scores = { };
-
-void init() {
-  set_screen_mode(ScreenMode::hires);
-  screen.sprites = Surface::load(spritesheet);
-  environment = new TileMap((uint8_t*)background1, nullptr, Size(32, 32), screen.sprites);
-  for(int i=0; i < SCORE_SCROLL_SIZE; ++i) bonus_scores.push_front(0);
-  restore_game();
-}
 
 void set_score(uint8_t matches) {
   uint32_t bonus = 0;
@@ -51,6 +44,48 @@ void set_score(uint8_t matches) {
 
   current_score += matches + bonus;
   if(current_score > high_score) high_score = current_score;
+}
+
+uint8_t* get_background(uint8_t level) {
+  if(level == 1) return (uint8_t *)background2;
+  return (uint8_t *)background1;
+}
+
+void set_time(uint32_t time) {
+  board.time_elapsed += time - last_update;
+  last_update = time;
+}
+
+void save_game() {
+  SaveData data = SaveData();
+  data.level = level;
+  data.current_score = current_score;
+  data.high_score = high_score;
+  board.serialize(data.board);
+  write_save(data);
+}
+
+void restore_game(bool reinitialize) {
+  SaveData data;
+  if(!reinitialize && read_save(data)) {
+    level = data.level;
+    current_score = data.current_score;
+    high_score = data.high_score;
+    board.deserialize(data.board);
+  } else {
+    level = 0;
+    current_score = 0;
+    high_score = 0;
+    board.initialize();
+  }
+}
+
+void next_level() {
+  level = (level + 1) % 2;
+  environment = new TileMap(get_background(level), nullptr, Size(32, 32), screen.sprites);
+  current_score = 0;
+  board.initialize();
+  save_game();
 }
 
 void render_cursor() {
@@ -100,6 +135,16 @@ void render_time() {
   screen.pen = oldPen;
 }
 
+void init() {
+  restore_game(true);
+
+  set_screen_mode(ScreenMode::hires);
+  screen.sprites = Surface::load(spritesheet);
+  for(int i=0; i < SCORE_SCROLL_SIZE; ++i) bonus_scores.push_front(0);
+
+  environment = new TileMap(get_background(level), nullptr, Size(32, 32), screen.sprites);
+}
+
 void render(uint32_t time) {
   screen.alpha = 255;
   screen.mask = nullptr;
@@ -116,13 +161,10 @@ void render(uint32_t time) {
 }
 
 void update(uint32_t time) {
-  board.time_elapsed += time - last_update;
-  last_update = time;
+  if(board.state == Board::NONE) set_time(time);
   if(board.time_elapsed > Board::GAME_TIME) {
-    current_score = 0;
-    board.clear();
-    board.initialize();
-    save_game();
+    if(board.state != Board::CLEAR) board.clear();
+    if(board.cleared()) next_level();
   }
 
   if(button_debounce < time) {
@@ -146,25 +188,4 @@ void update(uint32_t time) {
   set_score(matches);
 
   board.update();
-}
-
-void save_game() {
-  SaveData data = SaveData();
-  data.current_score = current_score;
-  data.high_score = high_score;
-  board.serialize(data.board);
-  write_save(data);
-}
-
-void restore_game(bool reinitialize) {
-  SaveData data;
-  if(!reinitialize && read_save(data)) {
-    current_score = data.current_score;
-    high_score = data.high_score;
-    board.deserialize(data.board);
-  } else {
-    current_score = 0;
-    high_score = 0;
-    board.initialize();
-  }
 }

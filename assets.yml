@@ -5,6 +5,9 @@ assets.cpp:
   assets/background1.tmx:
     name: background1
 
+  assets/background2.tmx:
+    name: background2
+
 font_asset.cpp:
   assets/fonts/Thicket.ttf:
     name: chevyray

@@ -28,18 +28,12 @@ const uint8_t  SCORE_SCROLL_SIZE        = 160;
 const uint8_t  TIME_BAR_SIZE            = 116;
 
 struct SaveData {
+  uint8_t level;
   uint32_t current_score;
   uint32_t high_score;
   std::pair<blit::Point, uint8_t> board[Board::COLS][Board::ROWS];
 };
 
 void init();
-
 void render(uint32_t time);
-void render_cursor();
-void render_board();
-
 void update(uint32_t time);
-
-void save_game();
-void restore_game(bool reinitialize=false);
