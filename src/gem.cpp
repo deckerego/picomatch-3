@@ -26,18 +26,30 @@ void Gem::advance_to(uint8_t x, uint8_t y) {
   position.y += sgn(dest_y - position.y) * 2;
 
   if(sprite_frame > 0) --sprite_frame;
-  if(state == Gem::VANISH && sprite_frame == 0) state = Gem::DELETE;
+}
+
+bool Gem::deletable() {
+  return
+    (state == Gem::VANISH || state == Gem::ASPLODE)
+    && sprite_frame == 0;
+}
+
+void Gem::draw_scale(blit::Surface screen, float scale) {
+  float scale_frame = sprite_frame == 0 ? scale : 1.0f + ((scale - 1.0f) / sprite_frame);
+  uint32_t origin_xy = scale_frame <= 0.0f ? 0 : (Gem::SPRITE_SIZE * (scale_frame - 1.0f)) / (scale_frame * 2);
+  blit::Rect sprite = blit::Rect(sprite_index * 3, 0, Gem::SPRITE_SIZE / 8, Gem::SPRITE_SIZE / 8);
+  blit::Point spr_orig = blit::Point(origin_xy, origin_xy);
+  blit::Point spr_pos = blit::Point(position.x, position.y);
+  screen.sprite(sprite, spr_pos, spr_orig, scale_frame, blit::SpriteTransform::NONE);
 }
 
 void Gem::draw(blit::Surface screen) {
-  blit::Rect sprite = blit::Rect(sprite_index * 3, 0, Gem::SPRITE_SIZE / 8, Gem::SPRITE_SIZE / 8);
   if(state == Gem::VANISH) {
-    float scale = sprite_frame == 0 ? 0.0f : 1.0f - (1.0f / sprite_frame);
-    uint8_t offset = (Gem::SPRITE_SIZE / 2) * (1 - scale);
-    uint8_t x = position.x + offset;
-    uint8_t y = position.y + offset;
-    screen.sprite(sprite, blit::Point(x, y), blit::Point(0, 0), scale, blit::SpriteTransform::NONE);
+    draw_scale(screen, 0.0f);
+  } else if(state == Gem::ASPLODE) {
+    draw_scale(screen, 4.0f);
   } else {
+    blit::Rect sprite = blit::Rect(sprite_index * 3, 0, Gem::SPRITE_SIZE / 8, Gem::SPRITE_SIZE / 8);
     screen.sprite(sprite, position);
   }
 }
@@ -56,5 +68,10 @@ bool Gem::eligible() {
 
 void Gem::vanish() {
   state = Gem::VANISH;
-  sprite_frame = 20;
+  sprite_frame = 30;
+}
+
+void Gem::asplode() {
+  state = Gem::ASPLODE;
+  sprite_frame = 30;
 }

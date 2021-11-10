@@ -52,7 +52,7 @@ void Board::update() {
   for(int8_t y = Board::ROWS - 1; y >= 0; --y) {
     for(uint8_t x = 0; x < Board::COLS; ++x) {
       Gem* gem = board[x][y];
-      if(gem->state == Gem::DELETE) remove(x, y);
+      if(gem->deletable()) remove(x, y);
       else gem->advance_to(x, y);
     }
   }
@@ -81,13 +81,18 @@ void Board::swap(uint8_t origin_x, uint8_t origin_y, uint8_t dest_x, uint8_t des
   board[origin_x][origin_y] = swap;
 }
 
-uint8_t vanish_count(std::vector<Gem*> match_list) {
+uint8_t remove_count(std::vector<Gem*> match_list) {
   uint8_t matched = 0;
   uint8_t list_size = match_list.size();
-  if(list_size > 2) {
+
+  if(list_size > 3) {
+    for(Gem* gem : match_list) gem->asplode();
+    matched += list_size;
+  } else if(list_size > 2) {
     for(Gem* gem : match_list) gem->vanish();
     matched += list_size;
   }
+
   return matched;
 }
 
@@ -95,7 +100,7 @@ uint8_t matches(std::vector<Gem*>* prev, Gem* current) {
   uint8_t matched = 0;
 
   if(prev->back()->sprite_index != current->sprite_index) {
-    matched += vanish_count(*prev);
+    matched += remove_count(*prev);
     prev->clear();
   }
   prev->push_back(current);
@@ -125,11 +130,11 @@ uint8_t Board::mark_matches() {
       }
     }
 
-    matched += vanish_count(prev_x);
-    matched += vanish_count(prev_y);
+    matched += remove_count(prev_x);
+    matched += remove_count(prev_y);
   }
 
-  //Take care of the last columns in a rectangular board
+  //Take care of the last columns in a wide rectangular board
   for(uint8_t x = Board::ROWS; x < Board::COLS; ++x) {
     if(!board[x][0]->eligible()) return matched;
     prev_y = { board[x][0] };
@@ -139,7 +144,7 @@ uint8_t Board::mark_matches() {
       matched += matches(&prev_y, board[x][y]);
     }
 
-    matched += vanish_count(prev_y);
+    matched += remove_count(prev_y);
   }
 
   return matched;

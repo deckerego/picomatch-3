@@ -23,7 +23,9 @@
 #include "cursor.hpp"
 
 const uint16_t BUTTON_DEBOUNCE_INTERVAL = 200;
-const uint16_t SAVE_DEBOUNCE_INTERVAL = 2000;
+const uint16_t SAVE_DEBOUNCE_INTERVAL   = 2000;
+const uint8_t  SCORE_SCROLL_SIZE        = 160;
+const uint8_t  TIME_BAR_SIZE            = 116;
 
 struct SaveData {
   uint32_t current_score;

@@ -32,7 +32,7 @@ struct Gem {
 
   static const uint8_t NONE         = 0;
   static const uint8_t VANISH       = 1;
-  static const uint8_t DELETE       = 2;
+  static const uint8_t ASPLODE      = 2;
 
   uint8_t state = Gem::NONE;
   uint8_t sprite_index = 0;
@@ -44,12 +44,16 @@ struct Gem {
 
   void advance_to(uint8_t x, uint8_t y);
   void draw(blit::Surface screen);
+  void vanish();
+  void asplode();
 
   bool left_of(Gem* of);
   bool up_of(Gem* of);
   bool eligible();
+  bool deletable();
 
-  void vanish();
+private:
+  void draw_scale(blit::Surface screen, float scale);
 };
 
 #endif
