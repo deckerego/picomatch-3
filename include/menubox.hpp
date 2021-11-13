@@ -17,42 +17,35 @@
 **/
 
 #include <cstdint>
-#include <cstdlib>
+#include "32blit.hpp"
 #include "config.hpp"
-#include "gem.hpp"
-#include "cursor.hpp"
 
-struct Board {
-  static const uint8_t  ROWS      = 9;
-  static const uint8_t  COLS      = 10;
-  static const uint32_t GAME_TIME = 30 * 1000;
+struct MenuItem {
+  void (*callback)();
+  std::string label;
 
-  static const uint8_t  NONE      = 0;
-  static const uint8_t  CLEAR     = 1;
-  static const uint8_t  INIT      = 2;
+  MenuItem(std::string label, void (*callback)()) : callback(callback), label(label) {};
+};
 
-  Gem* board[Board::COLS][Board::ROWS];
-  Cursor cursor = Cursor();
-  uint8_t state = Board::NONE;
-  uint32_t time_elapsed = 0;
+struct MenuBox {
+  static const uint8_t ACTIVE   = 0;
+  static const uint8_t INACTIVE = 1;
 
-  void initialize();
-  void clear();
-  bool cleared();
+  uint8_t state = MenuBox::INACTIVE;
+  uint8_t selected = 0;
+  std::vector<MenuItem> items = { MenuItem("Continue", nullptr) };
+
+  MenuBox() : state(MenuBox::INACTIVE) {};
+
+  void add_item(std::string text, void (*callback)());
   void draw(blit::Surface screen);
   void press(blit::ButtonState &buttons);
   void update(uint32_t time);
 
-  uint8_t mark_matches();
-
-  void serialize(std::pair<blit::Point, uint8_t> data[Board::COLS][Board::ROWS]);
-  void deserialize(std::pair<blit::Point, uint8_t> data[Board::COLS][Board::ROWS]);
-
 private:
   uint32_t button_debounce, update_time = 0;
 
-  void handle_actions(blit::ButtonState &buttons);
   void handle_dpad(blit::ButtonState &buttons);
-  void swap(uint8_t origin_x, uint8_t origin_y, uint8_t dest_x, uint8_t dest_y);
-  void remove(uint8_t x, uint8_t y);
+  void handle_actions(blit::ButtonState &buttons);
+  void close();
 };

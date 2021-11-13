@@ -18,6 +18,7 @@
 
 #include <cstdint>
 #include "pico3.hpp"
+#include "menubox.hpp"
 #include "assets.hpp"
 #include "font_asset.hpp"
 
@@ -26,12 +27,17 @@ using namespace blit;
 const Font custom_font(chevyray);
 
 Board board = Board();
-Cursor cursor = Cursor();
+MenuBox menu = MenuBox();
 TileMap* environment;
 uint8_t level = 0;
-uint32_t button_debounce, last_update = 0;
+uint32_t last_update = 0;
 uint32_t current_score, high_score = 0;
 std::deque<uint8_t> bonus_scores = { };
+
+uint8_t* get_background(uint8_t level) {
+  if(level == 1) return (uint8_t *)background2;
+  return (uint8_t *)background1;
+}
 
 void set_score(uint8_t matches) {
   uint32_t bonus = 0;
@@ -44,11 +50,6 @@ void set_score(uint8_t matches) {
 
   current_score += matches + bonus;
   if(current_score > high_score) high_score = current_score;
-}
-
-uint8_t* get_background(uint8_t level) {
-  if(level == 1) return (uint8_t *)background2;
-  return (uint8_t *)background1;
 }
 
 void set_time(uint32_t time) {
@@ -65,7 +66,7 @@ void save_game() {
   write_save(data);
 }
 
-void restore_game(bool reinitialize) {
+void restore_game(bool reinitialize = false) {
   SaveData data;
   if(!reinitialize && read_save(data)) {
     level = data.level;
@@ -86,10 +87,6 @@ void next_level() {
   current_score = 0;
   board.initialize();
   save_game();
-}
-
-void render_cursor() {
-  screen.sprite(cursor.sprite, cursor.position);
 }
 
 void render_new_scores() {
@@ -124,8 +121,8 @@ void render_score() {
 
 void render_time() {
   Pen oldPen = screen.pen;
-  uint32_t remaining_time = Board::GAME_TIME - board.time_elapsed;
-  uint32_t length = (remaining_time * TIME_BAR_SIZE) / Board::GAME_TIME;
+  int32_t remaining_time = Board::GAME_TIME - board.time_elapsed;
+  uint32_t length = remaining_time > 0 ? (remaining_time * TIME_BAR_SIZE) / Board::GAME_TIME : 0;
 
   if(remaining_time < 3000) screen.pen = Pen(0xFF, 0x5E, 0x30);
   else if(remaining_time < 7000) screen.pen = Pen(0xFF, 0xC8, 0x3D);
@@ -135,8 +132,15 @@ void render_time() {
   screen.pen = oldPen;
 }
 
-void init() {
+void reset() {
   restore_game(true);
+}
+
+void init() {
+  restore_game();
+
+  menu.state = MenuBox::ACTIVE;
+  menu.add_item("Reset Scores", &reset);
 
   set_screen_mode(ScreenMode::hires);
   screen.sprites = Surface::load(spritesheet);
@@ -152,40 +156,31 @@ void render(uint32_t time) {
   screen.clear();
 
   environment->draw(&screen, Rect(0, 0, 240, 240), nullptr);
-  board.draw(screen);
 
-  render_cursor();
+  if(menu.state == MenuBox::ACTIVE) {
+    menu.draw(screen);
+  } else {
+    board.draw(screen);
+  }
+
   render_score();
   render_time();
   render_new_scores();
 }
 
 void update(uint32_t time) {
-  if(board.state == Board::NONE) set_time(time);
-  if(board.time_elapsed > Board::GAME_TIME) {
-    if(board.state != Board::CLEAR) board.clear();
-    if(board.cleared()) next_level();
+  if(menu.state == MenuBox::ACTIVE) {
+    menu.press(buttons);
+    menu.update(time);
+  } else {
+    if(board.state == Board::NONE) set_time(time);
+    if(board.time_elapsed > Board::GAME_TIME) {
+      if(board.state != Board::CLEAR) board.clear();
+      if(board.cleared()) next_level();
+    }
+
+    board.press(buttons);
+    set_score(board.mark_matches());
+    board.update(time);
   }
-
-  if(button_debounce < time) {
-    bool pressed = true;
-    if(buttons.state & Button::DPAD_LEFT)       cursor.move_left();
-    else if(buttons.state & Button::DPAD_RIGHT) cursor.move_right();
-    else if(buttons.state & Button::DPAD_DOWN)  cursor.move_down();
-    else if(buttons.state & Button::DPAD_UP)    cursor.move_up();
-    else pressed = false;
-
-    if(pressed) button_debounce = time + BUTTON_DEBOUNCE_INTERVAL;
-  }
-
-  if(buttons.pressed & Button::Y) board.swap_left(cursor.location());
-  if(buttons.pressed & Button::A) board.swap_right(cursor.location());
-  if(buttons.pressed & Button::B) board.swap_down(cursor.location());
-  if(buttons.pressed & Button::X) board.swap_up(cursor.location());
-
-  uint8_t matches = board.mark_matches();
-
-  set_score(matches);
-
-  board.update();
 }

@@ -16,19 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include <cstdint>
-#include "32blit.hpp"
-#include "config.hpp"
-#include "board.hpp"
-#include "gem.hpp"
+#ifndef LIB_PICOMATCH_CONFIG
+#define LIB_PICOMATCH_CONFIG
 
-struct SaveData {
-  uint8_t level;
-  uint32_t current_score;
-  uint32_t high_score;
-  std::pair<blit::Point, uint8_t> board[Board::COLS][Board::ROWS];
-};
+const uint16_t BUTTON_DEBOUNCE_INTERVAL = 200;
+const uint16_t SAVE_DEBOUNCE_INTERVAL   = 2000;
+const uint8_t  SCORE_SCROLL_SIZE        = 160;
+const uint8_t  TIME_BAR_SIZE            = 116;
 
-void init();
-void render(uint32_t time);
-void update(uint32_t time);
+#endif

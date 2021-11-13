@@ -53,6 +53,8 @@ void Board::draw(blit::Surface screen) {
       if(board[x][y] != nullptr) board[x][y]->draw(screen);
     }
   }
+
+  screen.sprite(cursor.sprite, cursor.position);
 }
 
 void Board::remove(uint8_t x, uint8_t y) {
@@ -67,7 +69,46 @@ void Board::remove(uint8_t x, uint8_t y) {
   }
 }
 
-void Board::update() {
+void Board::swap(uint8_t origin_x, uint8_t origin_y, uint8_t dest_x, uint8_t dest_y) {
+  if(dest_x >= Board::COLS || dest_y >= Board::ROWS) return;
+  Gem* swap = board[dest_x][dest_y];
+  board[dest_x][dest_y] = board[origin_x][origin_y];
+  board[origin_x][origin_y] = swap;
+}
+
+void Board::handle_dpad(blit::ButtonState &buttons) {
+  if(button_debounce < update_time) {
+    bool pressed = true;
+    if(buttons.state & blit::Button::DPAD_LEFT)       cursor.move_left();
+    else if(buttons.state & blit::Button::DPAD_RIGHT) cursor.move_right();
+    else if(buttons.state & blit::Button::DPAD_DOWN)  cursor.move_down();
+    else if(buttons.state & blit::Button::DPAD_UP)    cursor.move_up();
+    else pressed = false;
+
+    if(pressed) button_debounce = update_time + BUTTON_DEBOUNCE_INTERVAL;
+  }
+}
+
+void Board::handle_actions(blit::ButtonState &buttons) {
+  std::pair<uint8_t, uint8_t> location = cursor.location();
+  if(buttons.pressed & blit::Button::Y)
+    swap(location.first, location.second, location.first - 1, location.second);
+  if(buttons.pressed & blit::Button::A)
+    swap(location.first, location.second, location.first + 1, location.second);
+  if(buttons.pressed & blit::Button::X)
+    swap(location.first, location.second, location.first, location.second - 1);
+  if(buttons.pressed & blit::Button::B)
+    swap(location.first, location.second, location.first, location.second + 1);
+}
+
+void Board::press(blit::ButtonState &buttons) {
+  handle_dpad(buttons);
+  handle_actions(buttons);
+}
+
+void Board::update(uint32_t time) {
+  update_time = time;
+
   for(int8_t y = Board::ROWS - 1; y >= 0; --y) {
     for(uint8_t x = 0; x < Board::COLS; ++x) {
       Gem* gem = board[x][y];
@@ -75,29 +116,6 @@ void Board::update() {
       else gem->advance_to(x, y);
     }
   }
-}
-
-void Board::swap_left(std::pair<uint8_t, uint8_t> location) {
- swap(location.first, location.second, location.first - 1, location.second);
-}
-
-void Board::swap_right(std::pair<uint8_t, uint8_t> location) {
- swap(location.first, location.second, location.first + 1, location.second);
-}
-
-void Board::swap_up(std::pair<uint8_t, uint8_t> location) {
- swap(location.first, location.second, location.first, location.second - 1);
-}
-
-void Board::swap_down(std::pair<uint8_t, uint8_t> location) {
- swap(location.first, location.second, location.first, location.second + 1);
-}
-
-void Board::swap(uint8_t origin_x, uint8_t origin_y, uint8_t dest_x, uint8_t dest_y) {
-  if(dest_x >= Board::COLS || dest_y >= Board::ROWS) return;
-  Gem* swap = board[dest_x][dest_y];
-  board[dest_x][dest_y] = board[origin_x][origin_y];
-  board[origin_x][origin_y] = swap;
 }
 
 uint8_t remove_count(std::vector<Gem*> match_list) {
