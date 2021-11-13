@@ -16,11 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef LIB_GEM
-#define LIB_GEM
+#ifndef LIB_PICOMATCH_GEM
+#define LIB_PICOMATCH_GEM
 
 #include <cstdint>
 #include "32blit.hpp"
+#include "config.hpp"
 
 template <typename T> int sgn(T v) {
     return (T(0) < v) - (v < T(0));
