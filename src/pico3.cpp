@@ -36,6 +36,8 @@ std::deque<uint8_t> bonus_scores = { };
 
 uint8_t* get_background(uint8_t level) {
   if(level == 1) return (uint8_t *)background2;
+  if(level == 2) return (uint8_t *)background3;
+  if(level == 3) return (uint8_t *)background4;
   return (uint8_t *)background1;
 }
 
@@ -82,7 +84,7 @@ void restore_game(bool reinitialize = false) {
 }
 
 void next_level() {
-  level = (level + 1) % 2;
+  level = (level + 1) % 4;
   environment = new TileMap(get_background(level), nullptr, Size(32, 32), screen.sprites);
   current_score = 0;
   board.initialize();

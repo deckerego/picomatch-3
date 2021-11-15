@@ -8,6 +8,12 @@ assets.cpp:
   assets/background2.tmx:
     name: background2
 
+  assets/background3.tmx:
+    name: background3
+
+  assets/background4.tmx:
+    name: background4
+
 font_asset.cpp:
   assets/fonts/Thicket.ttf:
     name: chevyray
