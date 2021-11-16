@@ -123,8 +123,8 @@ void render_score() {
 
 void render_time() {
   Pen oldPen = screen.pen;
-  int32_t remaining_time = Board::GAME_TIME - board.time_elapsed;
-  uint32_t length = remaining_time > 0 ? (remaining_time * TIME_BAR_SIZE) / Board::GAME_TIME : 0;
+  int32_t remaining_time = GAME_TIME - board.time_elapsed;
+  uint32_t length = remaining_time > 0 ? (remaining_time * TIME_BAR_SIZE) / GAME_TIME : 0;
 
   if(remaining_time < 3000) screen.pen = Pen(0xFF, 0x5E, 0x30);
   else if(remaining_time < 7000) screen.pen = Pen(0xFF, 0xC8, 0x3D);
@@ -176,7 +176,7 @@ void update(uint32_t time) {
     menu.update(time);
   } else {
     if(board.state == Board::NONE) set_time(time);
-    if(board.time_elapsed > Board::GAME_TIME) {
+    if(board.time_elapsed > GAME_TIME) {
       if(board.state != Board::CLEAR) board.clear();
       if(board.cleared()) next_level();
     }
