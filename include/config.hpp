@@ -23,6 +23,7 @@
 #include "font_asset.hpp"
 
 const blit::Font default_font(thicket);
+const uint32_t   GAME_TIME                = 30 * 1000;
 const uint16_t   BUTTON_DEBOUNCE_INTERVAL = 200;
 const uint16_t   SAVE_DEBOUNCE_INTERVAL   = 2000;
 const uint8_t    SCORE_SCROLL_SIZE        = 160;
