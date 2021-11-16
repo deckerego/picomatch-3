@@ -19,9 +19,13 @@
 #ifndef LIB_PICOMATCH_CONFIG
 #define LIB_PICOMATCH_CONFIG
 
-const uint16_t BUTTON_DEBOUNCE_INTERVAL = 200;
-const uint16_t SAVE_DEBOUNCE_INTERVAL   = 2000;
-const uint8_t  SCORE_SCROLL_SIZE        = 160;
-const uint8_t  TIME_BAR_SIZE            = 116;
+#include "32blit.hpp"
+#include "font_asset.hpp"
+
+const blit::Font default_font(thicket);
+const uint16_t   BUTTON_DEBOUNCE_INTERVAL = 200;
+const uint16_t   SAVE_DEBOUNCE_INTERVAL   = 2000;
+const uint8_t    SCORE_SCROLL_SIZE        = 160;
+const uint8_t    TIME_BAR_SIZE            = 116;
 
 #endif

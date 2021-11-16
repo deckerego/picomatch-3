@@ -25,7 +25,7 @@
 struct Board {
   static const uint8_t  ROWS      = 9;
   static const uint8_t  COLS      = 10;
-  static const uint32_t GAME_TIME = 30 * 1000;
+  static const uint32_t GAME_TIME = 4 * 1000;
 
   static const uint8_t  NONE      = 0;
   static const uint8_t  CLEAR     = 1;

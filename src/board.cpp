@@ -21,6 +21,7 @@
 
 void Board::initialize() {
   time_elapsed = 0;
+  update_time = 0;
   state = Board::NONE;
 
   for(uint8_t x = 0; x < Board::COLS; ++x) {
@@ -107,6 +108,7 @@ void Board::press(blit::ButtonState &buttons) {
 }
 
 void Board::update(uint32_t time) {
+  if(update_time > 0) time_elapsed += time - update_time;
   update_time = time;
 
   for(int8_t y = Board::ROWS - 1; y >= 0; --y) {

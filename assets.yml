@@ -16,5 +16,5 @@ assets.cpp:
 
 font_asset.cpp:
   assets/fonts/Thicket.ttf:
-    name: chevyray
+    name: thicket
     height: 12

@@ -20,31 +20,34 @@
 #include "32blit.hpp"
 #include "config.hpp"
 
-struct MenuItem {
-  void (*callback)();
-  std::string label;
+struct TextItem {
+  static const uint8_t NONE   = 0;
+  static const uint8_t ZOOM   = 1;
+  static const uint8_t LEFT   = 2;
+  static const uint8_t UP     = 4;
+  static const uint8_t RCOLOR = 8;
 
-  MenuItem(std::string label, void (*callback)()) : callback(callback), label(label) {};
+  std::string label;
+  blit::Point position;
+  uint8_t effects = NONE;
+  uint8_t frame = 200;
+
+  TextItem(std::string label, blit::Point pos, uint8_t effect) : label(label), position(pos), effects(effect) {};
 };
 
-struct MenuBox {
+struct TextArea {
   static const uint8_t ACTIVE   = 0;
   static const uint8_t INACTIVE = 1;
 
-  uint8_t state = MenuBox::INACTIVE;
-  uint8_t selected = 0;
-  std::vector<MenuItem> items = { MenuItem("Continue", nullptr) };
+  uint8_t state = TextArea::INACTIVE;
+  std::vector<TextItem*> items = { };
 
-  MenuBox() : state(MenuBox::INACTIVE) {};
+  TextArea() : state(TextArea::INACTIVE) {};
 
-  void add_item(std::string text, void (*callback)());
   void draw(blit::Surface screen);
-  void press(blit::ButtonState &buttons);
   void update(uint32_t time);
+  void add_item(std::string text, uint32_t x, uint32_t y, uint8_t effects);
 
 private:
-  uint32_t button_debounce, update_time = 0;
-
-  void handle_dpad(blit::ButtonState &buttons);
-  void handle_actions(blit::ButtonState &buttons);
+  uint32_t update_time = 0;
 };
