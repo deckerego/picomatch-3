@@ -19,25 +19,22 @@
 #include <cstdint>
 #include "pico3.hpp"
 #include "menubox.hpp"
+#include "textarea.hpp"
 #include "assets.hpp"
-#include "font_asset.hpp"
 
 using namespace blit;
 
-const Font custom_font(chevyray);
-
 Board board = Board();
 MenuBox menu = MenuBox();
+TextArea textarea = TextArea();
 TileMap* environment;
 uint8_t level = 0;
-uint32_t last_update = 0;
 uint32_t current_score, high_score = 0;
-std::deque<uint8_t> bonus_scores = { };
 
-uint8_t* get_background(uint8_t level) {
-  if(level == 1) return (uint8_t *)background2;
-  if(level == 2) return (uint8_t *)background3;
-  if(level == 3) return (uint8_t *)background4;
+uint8_t* get_background(uint8_t idx) {
+  if(idx == 1) return (uint8_t *)background2;
+  if(idx == 2) return (uint8_t *)background3;
+  if(idx == 3) return (uint8_t *)background4;
   return (uint8_t *)background1;
 }
 
@@ -47,16 +44,11 @@ void set_score(uint8_t matches) {
   if(matches > 5) bonus = matches * 10;
   if(matches > 3) bonus = matches * 5;
 
-  bonus_scores.push_front(bonus);
-  bonus_scores.pop_back();
+  if(bonus > 0)
+    textarea.add_item("+ " + std::to_string(bonus), 48, 206, TextItem::RCOLOR | TextItem::ZOOM | TextItem::UP);
 
   current_score += matches + bonus;
   if(current_score > high_score) high_score = current_score;
-}
-
-void set_time(uint32_t time) {
-  board.time_elapsed += time - last_update;
-  last_update = time;
 }
 
 void save_game() {
@@ -84,39 +76,22 @@ void restore_game(bool reinitialize = false) {
 }
 
 void next_level() {
-  level = (level + 1) % 4;
-  environment = new TileMap(get_background(level), nullptr, Size(32, 32), screen.sprites);
+  uint8_t background = ++level % 4;
+  environment = new TileMap(get_background(background), nullptr, Size(32, 32), screen.sprites);
   current_score = 0;
   board.initialize();
   save_game();
-}
-
-void render_new_scores() {
-  Pen oldPen = screen.pen;
-
-  uint8_t y_pos = 206;
-  for(uint8_t bonus_score : bonus_scores) {
-    y_pos -= 1;
-    if(bonus_score > 3) {
-      uint8_t idx = bonus_score % 20;
-      uint8_t base = (idx % 6) * 15;
-      if(idx <= 6) screen.pen = Pen(255 - base, base, 190);
-      else if(idx <= 12) screen.pen = Pen(190, 255 - base, base);
-      else screen.pen = Pen(base, 190, 255 - base);
-      screen.text("+ " + std::to_string(bonus_score), custom_font, Point(48, y_pos));
-    }
-  }
-
-  screen.pen = oldPen;
+  textarea.add_item("Level", 60, 220, TextItem::ZOOM | TextItem::UP | TextItem::HEADER);
+  textarea.add_item(std::to_string(level), 220, 120, TextItem::ZOOM | TextItem::LEFT | TextItem::HEADER);
 }
 
 void render_score() {
   Pen oldPen = screen.pen;
   screen.pen = Pen(0xFF, 0xFF, 0xFF);
-  screen.text("Score: " + std::to_string(current_score), custom_font, Point(9, 214));
+  screen.text("Score: " + std::to_string(current_score), default_font, Point(9, 214));
 
   if(current_score == high_score) screen.pen = Pen(0xB2, 0xFF, 0x23);
-  screen.text("Best: " + std::to_string(high_score), custom_font, Point(9, 226));
+  screen.text("Best: " + std::to_string(high_score), default_font, Point(9, 226));
 
   screen.pen = oldPen;
 }
@@ -146,7 +121,6 @@ void init() {
 
   set_screen_mode(ScreenMode::hires);
   screen.sprites = Surface::load(spritesheet);
-  for(int i=0; i < SCORE_SCROLL_SIZE; ++i) bonus_scores.push_front(0);
 
   environment = new TileMap(get_background(level), nullptr, Size(32, 32), screen.sprites);
 }
@@ -165,24 +139,24 @@ void render(uint32_t time) {
     board.draw(screen);
   }
 
+  textarea.draw(screen);
   render_score();
   render_time();
-  render_new_scores();
 }
 
 void update(uint32_t time) {
   if(menu.state == MenuBox::ACTIVE) {
     menu.press(buttons);
     menu.update(time);
+  } else if(board.time_elapsed > GAME_TIME) {
+    board.update(time);
+    if(board.state != Board::CLEAR) board.clear();
+    if(board.cleared()) next_level();
   } else {
-    if(board.state == Board::NONE) set_time(time);
-    if(board.time_elapsed > GAME_TIME) {
-      if(board.state != Board::CLEAR) board.clear();
-      if(board.cleared()) next_level();
-    }
-
     board.press(buttons);
     set_score(board.mark_matches());
     board.update(time);
   }
+
+  textarea.update(time);
 }

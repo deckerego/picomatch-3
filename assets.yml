@@ -16,5 +16,9 @@ assets.cpp:
 
 font_asset.cpp:
   assets/fonts/Thicket.ttf:
-    name: chevyray
+    name: thicket_12
     height: 12
+
+  assets/fonts/Picory-Smooth.ttf:
+    name: picory_smooth_24
+    height: 64

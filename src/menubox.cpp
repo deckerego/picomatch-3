@@ -17,11 +17,8 @@
 **/
 
 #include "menubox.hpp"
-#include "font_asset.hpp"
 
 using namespace blit;
-
-const Font custom_font(chevyray);
 
 void MenuBox::add_item(std::string label, void (*callback)()) {
   items.push_back(MenuItem(label, callback));
@@ -68,19 +65,19 @@ void MenuBox::draw(Surface screen) {
   screen.rectangle(Rect(36, 36, 168, 96));
 
   screen.pen = Pen(0xFF, 0x66, 0xFF);
-  screen.text("Pico", custom_font, Point(52, 52));
+  screen.text("Pico", default_font, Point(52, 52));
   screen.pen = Pen(0x66, 0xFF, 0xFF);
-  screen.text("Match", custom_font, Point(82, 52));
+  screen.text("Match", default_font, Point(82, 52));
   screen.pen = Pen(0xFF, 0xFF, 0x66);
-  screen.text("3", custom_font, Point(124, 52));
+  screen.text("3", default_font, Point(124, 52));
 
   screen.pen = Pen(0xFF, 0xFF, 0xFF);
   uint32_t x = 60, y = 72;
   for(MenuItem item : items) {
-    screen.text(item.label, custom_font, Point(x, y));
+    screen.text(item.label, default_font, Point(x, y));
     y += 20;
   }
-  screen.text(">", custom_font, Point(52, (selected * 20) + 72));
+  screen.text(">", default_font, Point(52, (selected * 20) + 72));
 
   screen.pen = oldPen;
 };

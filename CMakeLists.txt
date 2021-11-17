@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.9)
 project(pico3)
 
 include_directories(include src)
-set(PROJECT_SOURCE src/pico3.cpp src/gem.cpp src/board.cpp src/cursor.cpp src/menubox.cpp include/pico3.hpp include/gem.hpp include/board.hpp include/cursor.hpp include/menubox.hpp include/config.hpp)
+set(PROJECT_SOURCE src/pico3.cpp src/gem.cpp src/board.cpp src/cursor.cpp src/menubox.cpp src/textarea.cpp include/pico3.hpp include/gem.hpp include/board.hpp include/cursor.hpp include/menubox.hpp include/textarea.hpp include/config.hpp)
 
 set(PROJECT_DISTRIBS LICENSE README.md)
 
