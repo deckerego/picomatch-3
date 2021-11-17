@@ -81,8 +81,8 @@ void next_level() {
   current_score = 0;
   board.initialize();
   save_game();
-  textarea.add_item("Level", 60, 220, TextItem::ZOOM | TextItem::UP);
-  textarea.add_item(std::to_string(level), 220, 120, TextItem::ZOOM | TextItem::LEFT);
+  textarea.add_item("Level", 60, 220, TextItem::ZOOM | TextItem::UP | TextItem::HEADER);
+  textarea.add_item(std::to_string(level), 220, 120, TextItem::ZOOM | TextItem::LEFT | TextItem::HEADER);
 }
 
 void render_score() {

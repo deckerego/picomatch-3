@@ -26,11 +26,11 @@ struct TextItem {
   static const uint8_t LEFT   = 2;
   static const uint8_t UP     = 4;
   static const uint8_t RCOLOR = 8;
+  static const uint8_t HEADER = 16;
 
   std::string label;
   blit::Point position;
   uint8_t effects = NONE;
-  uint8_t frame = 200;
 
   TextItem(std::string label, blit::Point pos, uint8_t effect) : label(label), position(pos), effects(effect) {};
 };
@@ -46,7 +46,7 @@ struct TextArea {
 
   void draw(blit::Surface screen);
   void update(uint32_t time);
-  void add_item(std::string text, uint32_t x, uint32_t y, uint8_t effects);
+  void add_item(std::string text, int32_t x, int32_t y, uint8_t effects);
 
 private:
   uint32_t update_time = 0;

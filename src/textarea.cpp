@@ -20,7 +20,7 @@
 
 using namespace blit;
 
-void TextArea::add_item(std::string label, uint32_t x, uint32_t y, uint8_t effects) {
+void TextArea::add_item(std::string label, int32_t x, int32_t y, uint8_t effects) {
   Point position = Point(x, y);
   items.push_back(new TextItem(label, position, effects));
   state = TextArea::ACTIVE;
@@ -34,23 +34,33 @@ Pen color_random() {
   return Pen(base, 190, 255 - base);
 }
 
+Pen get_color(TextItem* item) {
+  if(item->effects & TextItem::RCOLOR) return color_random();
+  return Pen(0xFF, 0xFF, 0xFF);
+}
+
+Font get_font(TextItem* item) {
+  if(item->effects & TextItem::HEADER) return header_font;
+  return default_font;
+}
+
 void TextArea::update(uint32_t time) {
   if(state == TextArea::INACTIVE) return;
-  if(time - update_time < 10) return;
 
   update_time = time;
   std::vector<TextItem*> items_new = { };
 
   for(TextItem* item : items) {
-    if(item->frame > 0) {
-      item->frame -= 1;
-      if(item->effects & TextItem::ZOOM) {
-        if(item->effects & TextItem::UP) item->position.y -= 1;
-        if(item->effects & TextItem::LEFT) item->position.x -= 1;
-      }
-      items_new.push_back(item);
-    } else {
+    if(item->effects & TextItem::ZOOM) {
+      if(item->effects & TextItem::UP) item->position.y -= 1;
+      if(item->effects & TextItem::LEFT) item->position.x -= 1;
+    }
+
+    if(item->position.x < 0 || item->position.x > 240 ||
+       item->position.y < 0 || item->position.y > 240) {
       delete item;
+    } else {
+      items_new.push_back(item);
     }
   }
   items = items_new;
@@ -66,8 +76,8 @@ void TextArea::draw(Surface screen) {
   Pen oldPen = screen.pen;
 
   for(TextItem* item : items) {
-    screen.pen = item->effects & TextItem::RCOLOR ? color_random() : Pen(0xFF, 0xFF, 0xFF);
-    screen.text(item->label, default_font, item->position);
+    screen.pen = get_color(item);
+    screen.text(item->label, get_font(item), item->position);
   }
 
   screen.pen = oldPen;
