@@ -28,14 +28,21 @@ Board board = Board();
 MenuBox menu = MenuBox();
 TextArea textarea = TextArea();
 TileMap* environment;
-uint8_t level = 0;
+uint8_t level = 1;
 uint32_t current_score, high_score = 0;
 
-uint8_t* get_background(uint8_t idx) {
+uint8_t* get_background(uint8_t level) {
+  uint8_t idx = level % 4;
   if(idx == 1) return (uint8_t *)background2;
   if(idx == 2) return (uint8_t *)background3;
   if(idx == 3) return (uint8_t *)background4;
   return (uint8_t *)background1;
+}
+
+uint8_t get_gem_type(uint8_t level) {
+  if(level % 10 == 9) return Gem::FRUIT;
+  if(level % 3 == 0) return Gem::GEMS;
+  return Gem::SHAPES;
 }
 
 void set_score(uint8_t matches) {
@@ -66,9 +73,10 @@ void restore_game(bool reinitialize = false) {
     level = data.level;
     current_score = data.current_score;
     high_score = data.high_score;
+    board.gem_type = get_gem_type(level);
     board.deserialize(data.board);
   } else {
-    level = 0;
+    level = 1;
     current_score = 0;
     high_score = 0;
     board.initialize();
@@ -76,8 +84,9 @@ void restore_game(bool reinitialize = false) {
 }
 
 void next_level() {
-  uint8_t background = ++level % 4;
-  environment = new TileMap(get_background(background), nullptr, Size(32, 32), screen.sprites);
+  ++level;
+  environment = new TileMap(get_background(level), nullptr, Size(32, 32), screen.sprites);
+  board.gem_type = get_gem_type(level);
   current_score = 0;
   board.initialize();
   save_game();
