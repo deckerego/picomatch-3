@@ -50,13 +50,13 @@ struct Gem {
          if(type & Gem::SHAPES)  sprite_row = 3;
     else if(type & Gem::FRUIT)   sprite_row = 6;
     else if(type & Gem::GEMS)    sprite_row = 9;
-    else if(type & Gem::SPECIAL) sprite_row = 12;
   };
 
   void advance_to(uint8_t x, uint8_t y);
   void draw(blit::Surface screen);
   void vanish();
   void asplode();
+  void special();
 
   bool left_of(Gem* of);
   bool up_of(Gem* of);

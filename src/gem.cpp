@@ -80,6 +80,12 @@ bool Gem::eligible() {
   return state == Gem::NONE && position.y >= 0;
 }
 
+void Gem::special() {
+  state = Gem::NONE;
+  type = Gem::SPECIAL;
+  sprite_row = 12;
+}
+
 void Gem::vanish() {
   state = Gem::VANISH;
   sprite_frame = 30;
