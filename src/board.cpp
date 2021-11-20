@@ -28,7 +28,7 @@ void Board::initialize() {
     for(uint8_t y = 0; y < Board::ROWS; ++y) {
       int32_t y_pos = ((y - Board::ROWS) * Gem::SPRITE_SIZE) + (8 * y);
       int32_t x_pos = x * Gem::SPRITE_SIZE;
-      board[x][y] = new Gem(blit::Point(x_pos, y_pos));
+      board[x][y] = new Gem(blit::Point(x_pos, y_pos), gem_type);
     }
   }
 }
@@ -65,7 +65,7 @@ void Board::remove(uint8_t x, uint8_t y) {
     board[x][y - 1] = gem;
   } else {
     int8_t prev_y = board[x][1]->position.y;
-    board[x][0] = state == Board::CLEAR ? nullptr : new Gem(blit::Point(x * Gem::SPRITE_SIZE, prev_y - Gem::SPRITE_SIZE));
+    board[x][0] = state == Board::CLEAR ? nullptr : new Gem(blit::Point(x * Gem::SPRITE_SIZE, prev_y - Gem::SPRITE_SIZE), gem_type);
     delete gem;
   }
 }
@@ -202,7 +202,7 @@ void Board::serialize(std::pair<blit::Point, uint8_t> data[Board::COLS][Board::R
 void Board::deserialize(std::pair<blit::Point, uint8_t> data[Board::COLS][Board::ROWS]) {
   for(uint8_t y = 0; y < Board::ROWS; ++y) {
     for(uint8_t x = 0; x < Board::COLS; ++x) {
-      board[x][y] = new Gem(data[x][y].first, data[x][y].second);
+      board[x][y] = new Gem(data[x][y].first, gem_type, data[x][y].second);
     }
   }
 }

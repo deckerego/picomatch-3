@@ -33,6 +33,7 @@ struct Board {
   Gem* board[Board::COLS][Board::ROWS];
   Cursor cursor = Cursor();
   uint8_t state = Board::NONE;
+  uint8_t gem_type = Gem::SHAPES;
   uint32_t time_elapsed = 0;
 
   void initialize();
