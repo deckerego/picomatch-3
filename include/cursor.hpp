@@ -22,7 +22,7 @@
 
 struct Cursor {
     blit::Point position = blit::Point(0, 0);
-    blit::Rect sprite = blit::Rect(0, 6, 3, 3);
+    blit::Rect sprite = blit::Rect(0, 0, 3, 3);
 
     void move_left();
     void move_right();
