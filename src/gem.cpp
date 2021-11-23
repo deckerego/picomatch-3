@@ -29,9 +29,11 @@ void Gem::advance_to(uint8_t x, uint8_t y) {
 }
 
 bool Gem::deletable() {
-  return
-    (state == Gem::VANISH || state == Gem::ASPLODE)
-    && sprite_frame == 0;
+  return state & Gem::REMOVE && sprite_frame == 0;
+}
+
+bool Gem::equals(Gem* other) {
+  return (type == other->type) && (sprite_index == other->sprite_index);
 }
 
 void Gem::draw_scale(blit::Surface screen, float scale) {
@@ -87,11 +89,11 @@ void Gem::special() {
 }
 
 void Gem::vanish() {
-  state = Gem::VANISH;
+  state = Gem::VANISH | Gem::REMOVE;
   sprite_frame = 30;
 }
 
 void Gem::asplode() {
-  state = Gem::ASPLODE;
+  state = Gem::ASPLODE | Gem::REMOVE;
   sprite_frame = 30;
 }

@@ -72,15 +72,15 @@ void Board::remove(uint8_t x, uint8_t y) {
 
 void Board::swap(uint8_t origin_x, uint8_t origin_y, uint8_t dest_x, uint8_t dest_y) {
   if(dest_x >= Board::COLS || dest_y >= Board::ROWS) return;
+
   Gem* swap = board[origin_x][origin_y];
   board[origin_x][origin_y] = board[dest_x][dest_y];
   board[dest_x][dest_y] = swap;
 
-  if(swap->type & Gem::SPECIAL && origin_x == dest_x) {
-    for(int8_t x = 0; x < Board::COLS; ++x) board[x][dest_y]->asplode();
-  } else if(swap->type & Gem::SPECIAL && origin_y == dest_y) {
-    for(int8_t y = 0; y < Board::ROWS; ++y) board[dest_x][y]->asplode();
-  }
+  if((swap->type & Gem::SPECIAL) && (origin_x == dest_x))
+    for(int y = 0; y < Board::ROWS; ++y) board[dest_x][y]->state |= Gem::MARKED;
+  else if((swap->type & Gem::SPECIAL) && (origin_y == dest_y))
+    for(int x = 0; x < Board::COLS; ++x) board[x][dest_y]->state |= Gem::MARKED;
 }
 
 void Board::handle_dpad(blit::ButtonState &buttons) {
@@ -149,8 +149,7 @@ uint8_t remove_count(std::vector<Gem*> match_list) {
 uint8_t matches(std::vector<Gem*>* prev, Gem* current) {
   uint8_t matched = 0;
 
-  if(prev->back()->type != current->type ||
-    prev->back()->sprite_index != current->sprite_index) {
+  if(!(current->state & Gem::MARKED) && !prev->back()->equals(current)) {
     matched += remove_count(*prev);
     prev->clear();
   }
