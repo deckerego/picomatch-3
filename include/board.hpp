@@ -47,6 +47,7 @@ struct Board {
 
   void serialize(std::pair<blit::Point, uint8_t> data[Board::COLS][Board::ROWS]);
   void deserialize(std::pair<blit::Point, uint8_t> data[Board::COLS][Board::ROWS]);
+  std::string to_string();
 
 private:
   uint32_t button_debounce, update_time = 0;

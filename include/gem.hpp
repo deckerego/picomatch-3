@@ -65,6 +65,7 @@ struct Gem {
   bool eligible();
   bool deletable();
   bool equals(Gem* other);
+  std::string to_string();
 
 private:
   uint8_t sprite_row = 0;

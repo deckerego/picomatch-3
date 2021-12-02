@@ -217,3 +217,15 @@ void Board::deserialize(std::pair<blit::Point, uint8_t> data[Board::COLS][Board:
     }
   }
 }
+
+std::string Board::to_string() {
+  std::string board_str = "";
+  for(uint8_t y = 0; y < Board::ROWS; ++y) {
+    board_str += "| ";
+    for(uint8_t x = 0; x < Board::COLS; ++x) {
+      board_str += "[" + board[x][y]->to_string() + "] ";
+    }
+    board_str += "|\n";
+  }
+  return board_str;
+}

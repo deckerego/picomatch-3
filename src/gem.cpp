@@ -79,7 +79,7 @@ bool Gem::up_of(Gem* of) {
 }
 
 bool Gem::eligible() {
-  return state == Gem::NONE && position.y >= 0;
+  return (state == Gem::NONE || state == Gem::MARKED) && position.y >= 0;
 }
 
 void Gem::special() {
@@ -96,4 +96,8 @@ void Gem::vanish() {
 void Gem::asplode() {
   state = Gem::ASPLODE | Gem::REMOVE;
   sprite_frame = 30;
+}
+
+std::string Gem::to_string() {
+  return std::to_string(state);
 }
