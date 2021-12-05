@@ -35,7 +35,7 @@ struct Gem {
   static const uint8_t REMOVE       = 1;
   static const uint8_t VANISH       = 2;
   static const uint8_t ASPLODE      = 4;
-  static const uint8_t MARKED       = 8;
+  static const uint8_t PRIMED       = 8;
 
   static const uint8_t SHAPES       = 1;
   static const uint8_t FRUIT        = 2;

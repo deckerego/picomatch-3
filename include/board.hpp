@@ -39,10 +39,10 @@ struct Board {
   void initialize();
   void clear();
   bool cleared();
+
   void draw(blit::Surface screen);
   void press(blit::ButtonState &buttons);
   void update(uint32_t time);
-
   uint8_t mark_matches();
 
   void serialize(std::pair<blit::Point, uint8_t> data[Board::COLS][Board::ROWS]);
@@ -55,5 +55,9 @@ private:
   void handle_actions(blit::ButtonState &buttons);
   void handle_dpad(blit::ButtonState &buttons);
   void swap(uint8_t origin_x, uint8_t origin_y, uint8_t dest_x, uint8_t dest_y);
+
+  uint8_t matches(std::vector<Gem*>* prev, uint8_t col, uint8_t row);
   void remove(uint8_t x, uint8_t y);
+  uint8_t remove_surrounding(uint8_t col, uint8_t row);
+  uint8_t remove_count(std::vector<Gem*> match_list);
 };

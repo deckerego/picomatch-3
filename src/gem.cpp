@@ -79,11 +79,11 @@ bool Gem::up_of(Gem* of) {
 }
 
 bool Gem::eligible() {
-  return (state == Gem::NONE || state == Gem::MARKED) && position.y >= 0;
+  return state == Gem::NONE && position.y >= 0;
 }
 
 void Gem::special() {
-  state = Gem::NONE;
+  state = Gem::PRIMED;
   type = Gem::SPECIAL;
   sprite_row = 12;
 }

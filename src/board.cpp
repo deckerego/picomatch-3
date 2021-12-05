@@ -77,10 +77,7 @@ void Board::swap(uint8_t origin_x, uint8_t origin_y, uint8_t dest_x, uint8_t des
   board[origin_x][origin_y] = board[dest_x][dest_y];
   board[dest_x][dest_y] = swap;
 
-  if((swap->type & Gem::SPECIAL) && (origin_x == dest_x))
-    for(int y = 0; y < Board::ROWS; ++y) board[dest_x][y]->state |= Gem::MARKED;
-  else if((swap->type & Gem::SPECIAL) && (origin_y == dest_y))
-    for(int x = 0; x < Board::COLS; ++x) board[x][dest_y]->state |= Gem::MARKED;
+  if(swap->state & Gem::PRIMED) swap->state ^= Gem::PRIMED;
 }
 
 void Board::handle_dpad(blit::ButtonState &buttons) {
@@ -126,7 +123,27 @@ void Board::update(uint32_t time) {
   }
 }
 
-uint8_t remove_count(std::vector<Gem*> match_list) {
+// Eliminated all surrounding gems
+uint8_t Board::remove_surrounding(uint8_t col, uint8_t row) {
+  uint8_t matched = 0;
+  for(int8_t h = -1; h <= 1; ++h) {
+    int8_t x = col + h;
+    if(x < 0 || x >= Board::COLS) continue;
+
+    for(int8_t v = -1; v <= 1; ++v) {
+      int8_t y = row + v;
+      if(y < 0 || y >= Board::ROWS) continue;
+
+      board[x][y]->vanish();
+      matched += 2;
+    }
+  }
+  board[col][row]->asplode();
+  return matched;
+}
+
+// Remove all gems in a row
+uint8_t Board::remove_count(std::vector<Gem*> match_list) {
   uint8_t matched = 0;
   uint8_t list_size = match_list.size();
 
@@ -146,10 +163,14 @@ uint8_t remove_count(std::vector<Gem*> match_list) {
   return matched;
 }
 
-uint8_t matches(std::vector<Gem*>* prev, Gem* current) {
+uint8_t Board::matches(std::vector<Gem*>* prev, uint8_t col, uint8_t row) {
+  Gem* current = board[col][row];
   uint8_t matched = 0;
 
-  if(!(current->state & Gem::MARKED) && !prev->back()->equals(current)) {
+  if(current->type == Gem::SPECIAL) {
+    matched += remove_surrounding(col, row);
+    prev->clear();
+  } else if(!prev->back()->equals(current)) {
     matched += remove_count(*prev);
     prev->clear();
   }
@@ -173,12 +194,14 @@ uint8_t Board::mark_matches() {
     prev_y = { board[y][0] };
 
     for(uint8_t x = 1; x < Board::COLS; ++x) {
-      if(!board[x][y]->eligible()) return matched;
-      matched += matches(&prev_x, board[x][y]);
+      if(board[x][y]->eligible()) {
+        matched += matches(&prev_x, x, y);
+      }
 
       if(x < Board::ROWS) {
-        if(!board[y][x]->eligible()) return matched;
-        matched += matches(&prev_y, board[y][x]);
+        if(board[y][x]->eligible()) {
+          matched += matches(&prev_y, y, x);
+        }
       }
     }
 
@@ -188,12 +211,14 @@ uint8_t Board::mark_matches() {
 
   //Take care of the last columns in a wide rectangular board
   for(uint8_t x = Board::ROWS; x < Board::COLS; ++x) {
-    if(!board[x][0]->eligible()) return matched;
-    prev_y = { board[x][0] };
+    if(board[x][0]->eligible()) {
+      prev_y = { board[x][0] };
+    }
 
     for(uint8_t y = 1; y < Board::ROWS; ++y) {
-      if(!board[x][y]->eligible()) return matched;
-      matched += matches(&prev_y, board[x][y]);
+      if(board[x][y]->eligible()) {
+        matched += matches(&prev_y, x, y);
+      }
     }
 
     matched += remove_count(prev_y);
