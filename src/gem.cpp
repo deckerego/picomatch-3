@@ -41,8 +41,7 @@ void Gem::draw_scale(blit::Surface screen, float scale) {
   uint32_t origin_xy = scale_frame <= 0.0f ? 0 : (Gem::SPRITE_SIZE * (scale_frame - 1.0f)) / (scale_frame * 2);
   blit::Rect sprite = blit::Rect(sprite_index * 3, sprite_row, Gem::SPRITE_SIZE / 8, Gem::SPRITE_SIZE / 8);
   blit::Point spr_orig = blit::Point(origin_xy, origin_xy);
-  blit::Point spr_pos = blit::Point(position.x, position.y);
-  screen.sprite(sprite, spr_pos, spr_orig, scale_frame, blit::SpriteTransform::NONE);
+  screen.sprite(sprite, position, spr_orig, scale_frame, blit::SpriteTransform::NONE);
 }
 
 void Gem::draw_transform(blit::Surface screen, uint8_t sprite_idx, blit::SpriteTransform transformation) {
@@ -53,17 +52,17 @@ void Gem::draw_transform(blit::Surface screen, uint8_t sprite_idx, blit::SpriteT
 void Gem::draw(blit::Surface screen) {
   if(state & Gem::VANISH) {
     draw_scale(screen, 0.0f);
-  } else if((state & Gem::ASPLODE) && (type & Gem::SPECIAL)) {
+  } else if(state & Gem::ASPLODE && type & Gem::SPECIAL) {
     draw_scale(screen, 16.0f);
   } else if(state & Gem::ASPLODE) {
     draw_scale(screen, 4.0f);
   } else if(type & Gem::SPECIAL) {
     blit::SpriteTransform transform = blit::SpriteTransform::NONE;
-    uint8_t sprite_idx = sprite_frame / 10;
+    uint8_t sprite_idx = sprite_frame / 2;
     if(sprite_idx == 2 || sprite_idx == 3) transform = blit::SpriteTransform::R90;
     else if(sprite_idx == 4) transform = blit::SpriteTransform::R180;
     draw_transform(screen, sprite_idx % 2, transform);
-    if(sprite_frame == 0) sprite_frame = 40;
+    if(sprite_frame == 0) sprite_frame = 8;
   } else {
     blit::Rect sprite = blit::Rect(sprite_index * 3, sprite_row, Gem::SPRITE_SIZE / 8, Gem::SPRITE_SIZE / 8);
     screen.sprite(sprite, position);
@@ -92,12 +91,12 @@ void Gem::special() {
 
 void Gem::vanish() {
   state = Gem::VANISH | Gem::REMOVE;
-  sprite_frame = 30;
+  sprite_frame = 3;
 }
 
 void Gem::asplode() {
   state = Gem::ASPLODE | Gem::REMOVE;
-  sprite_frame = 30;
+  sprite_frame = 3;
 }
 
 std::string Gem::to_string() {
