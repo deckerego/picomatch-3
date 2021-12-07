@@ -72,9 +72,12 @@ void Board::remove(uint8_t x, uint8_t y) {
 
 void Board::swap(uint8_t origin_x, uint8_t origin_y, uint8_t dest_x, uint8_t dest_y) {
   if(dest_x >= Board::COLS || dest_y >= Board::ROWS) return;
-  Gem* swap = board[dest_x][dest_y];
-  board[dest_x][dest_y] = board[origin_x][origin_y];
-  board[origin_x][origin_y] = swap;
+
+  Gem* swap = board[origin_x][origin_y];
+  board[origin_x][origin_y] = board[dest_x][dest_y];
+  board[dest_x][dest_y] = swap;
+
+  if(swap->state & Gem::PRIMED) swap->state ^= Gem::PRIMED;
 }
 
 void Board::handle_dpad(blit::ButtonState &buttons) {
@@ -120,11 +123,36 @@ void Board::update(uint32_t time) {
   }
 }
 
-uint8_t remove_count(std::vector<Gem*> match_list) {
+// Eliminated all surrounding gems
+uint8_t Board::remove_surrounding(uint8_t col, uint8_t row) {
+  uint8_t matched = 0;
+  for(int8_t h = -1; h <= 1; ++h) {
+    int8_t x = col + h;
+    if(x < 0 || x >= Board::COLS) continue;
+
+    for(int8_t v = -1; v <= 1; ++v) {
+      int8_t y = row + v;
+      if(y < 0 || y >= Board::ROWS) continue;
+
+      board[x][y]->vanish();
+      matched += 2;
+    }
+  }
+  board[col][row]->asplode();
+  return matched;
+}
+
+// Remove all gems in a row
+uint8_t Board::remove_count(std::vector<Gem*> match_list) {
   uint8_t matched = 0;
   uint8_t list_size = match_list.size();
 
-  if(list_size > 3) {
+  if(list_size > 4) {
+    match_list.back()->special();
+    match_list.pop_back();
+    for(Gem* gem : match_list) gem->asplode();
+    matched += list_size;
+  } else if(list_size > 3) {
     for(Gem* gem : match_list) gem->asplode();
     matched += list_size;
   } else if(list_size > 2) {
@@ -135,10 +163,14 @@ uint8_t remove_count(std::vector<Gem*> match_list) {
   return matched;
 }
 
-uint8_t matches(std::vector<Gem*>* prev, Gem* current) {
+uint8_t Board::matches(std::vector<Gem*>* prev, uint8_t col, uint8_t row) {
+  Gem* current = board[col][row];
   uint8_t matched = 0;
 
-  if(prev->back()->sprite_index != current->sprite_index) {
+  if(current->type == Gem::SPECIAL) {
+    matched += remove_surrounding(col, row);
+    prev->clear();
+  } else if(!prev->back()->equals(current)) {
     matched += remove_count(*prev);
     prev->clear();
   }
@@ -162,12 +194,14 @@ uint8_t Board::mark_matches() {
     prev_y = { board[y][0] };
 
     for(uint8_t x = 1; x < Board::COLS; ++x) {
-      if(!board[x][y]->eligible()) return matched;
-      matched += matches(&prev_x, board[x][y]);
+      if(board[x][y]->eligible()) {
+        matched += matches(&prev_x, x, y);
+      }
 
       if(x < Board::ROWS) {
-        if(!board[y][x]->eligible()) return matched;
-        matched += matches(&prev_y, board[y][x]);
+        if(board[y][x]->eligible()) {
+          matched += matches(&prev_y, y, x);
+        }
       }
     }
 
@@ -177,12 +211,14 @@ uint8_t Board::mark_matches() {
 
   //Take care of the last columns in a wide rectangular board
   for(uint8_t x = Board::ROWS; x < Board::COLS; ++x) {
-    if(!board[x][0]->eligible()) return matched;
-    prev_y = { board[x][0] };
+    if(board[x][0]->eligible()) {
+      prev_y = { board[x][0] };
+    }
 
     for(uint8_t y = 1; y < Board::ROWS; ++y) {
-      if(!board[x][y]->eligible()) return matched;
-      matched += matches(&prev_y, board[x][y]);
+      if(board[x][y]->eligible()) {
+        matched += matches(&prev_y, x, y);
+      }
     }
 
     matched += remove_count(prev_y);
@@ -205,4 +241,16 @@ void Board::deserialize(std::pair<blit::Point, uint8_t> data[Board::COLS][Board:
       board[x][y] = new Gem(data[x][y].first, gem_type, data[x][y].second);
     }
   }
+}
+
+std::string Board::to_string() {
+  std::string board_str = "";
+  for(uint8_t y = 0; y < Board::ROWS; ++y) {
+    board_str += "| ";
+    for(uint8_t x = 0; x < Board::COLS; ++x) {
+      board_str += "[" + board[x][y]->to_string() + "] ";
+    }
+    board_str += "|\n";
+  }
+  return board_str;
 }
