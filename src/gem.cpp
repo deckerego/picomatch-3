@@ -29,7 +29,7 @@ void Gem::advance_to(uint8_t x, uint8_t y) {
 }
 
 bool Gem::deletable() {
-  return state & Gem::REMOVE && sprite_frame == 0;
+  return (state & Gem::REMOVE) && (sprite_frame == 0);
 }
 
 bool Gem::equals(Gem* other) {
@@ -47,13 +47,14 @@ void Gem::draw_scale(blit::Surface screen, float scale) {
 
 void Gem::draw_transform(blit::Surface screen, uint8_t sprite_idx, blit::SpriteTransform transformation) {
   blit::Rect sprite = blit::Rect(sprite_idx * 3, sprite_row, Gem::SPRITE_SIZE / 8, Gem::SPRITE_SIZE / 8);
-  blit::Point spr_pos = blit::Point(position.x, position.y);
-  screen.sprite(sprite, spr_pos, transformation);
+  screen.sprite(sprite, position, transformation);
 }
 
 void Gem::draw(blit::Surface screen) {
   if(state & Gem::VANISH) {
     draw_scale(screen, 0.0f);
+  } else if((state & Gem::ASPLODE) && (type & Gem::SPECIAL)) {
+    draw_scale(screen, 16.0f);
   } else if(state & Gem::ASPLODE) {
     draw_scale(screen, 4.0f);
   } else if(type & Gem::SPECIAL) {
@@ -86,6 +87,7 @@ void Gem::special() {
   state = Gem::PRIMED;
   type = Gem::SPECIAL;
   sprite_row = 12;
+  sprite_index = 0;
 }
 
 void Gem::vanish() {
